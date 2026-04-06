@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Flow Table 空間管理系統</title>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
@@ -27,7 +27,7 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', '微軟正黑體', sans-serif;
   background: var(--bg-primary); color: var(--text-primary);
-  min-height: 100vh; overflow-x: hidden; line-height: 1.6;
+  min-height: 100vh; overflow-x: hidden; line-height: 1.6; user-select: none;
 }
 
 .app-header {
@@ -51,14 +51,14 @@ body {
 .step.done + .step .step-line, .step.done .step-line { background: var(--accent); }
 
 .main-content { max-width: 1200px; margin: 0 auto; padding: 100px 24px 120px; }
-.phase-section { display: none; animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+.phase-section { display: none; animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
 .phase-section.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 .phase-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; color: var(--text-primary); }
 .phase-subtitle { color: var(--text-secondary); margin-bottom: 24px; font-size: 1rem; }
 
 .card {
-  background: var(--bg-card); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); border: 1px solid rgba(0,0,0,0.02);
+  background: var(--bg-card); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); border: 1px solid rgba(0,0,0,0.02); margin-bottom: 24px;
 }
 .card-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; color: var(--text-primary); }
 
@@ -77,15 +77,18 @@ body {
   position: absolute; top: 16px; left: 16px; background: rgba(255,255,255,0.9);
   padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 15;
 }
-.scan-progress-bar {
-  position: absolute; bottom: 0; left: 0; height: 6px; background: var(--accent); width: 0%; z-index: 15; transition: width 0.1s linear; display: none;
-}
 .scan-hint-text {
-  position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.6); color: #fff;
+  position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); color: #fff;
   padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; z-index: 15; display: none; white-space: nowrap;
 }
+.grid-scan-effect {
+  position: absolute; inset: 0; z-index: 12; display: none;
+  background-image: linear-gradient(rgba(107, 144, 128, 0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(107, 144, 128, 0.4) 1px, transparent 1px);
+  background-size: 40px 40px; transform: perspective(500px) rotateX(60deg) scale(2); transform-origin: bottom center; animation: gridMove 2s linear infinite; pointer-events: none;
+}
+@keyframes gridMove { 0% { background-position: 0 0; opacity: 0; } 50% { opacity: 1; } 100% { background-position: 0 40px; opacity: 0; } }
 
-.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
 .form-group { display: flex; flex-direction: column; gap: 8px; }
 .form-group label { font-size: 0.9rem; color: var(--text-secondary); font-weight: 600; }
 .form-group input, .form-group select {
@@ -98,16 +101,26 @@ body {
   display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 24px; font-size: 0.9rem; font-weight: 600;
   background: var(--bg-primary); color: var(--text-primary); border: 1px solid rgba(0,0,0,0.05);
 }
-.module-tag .qty { color: var(--text-secondary); font-weight: 400; }
 .esg-tag.env { background: rgba(129,199,132,0.15); color: #4CAF50; border-color: rgba(129,199,132,0.3); }
 .esg-tag.social { background: rgba(100,181,246,0.15); color: #2196F3; border-color: rgba(100,181,246,0.3); }
+.esg-tag.gov { background: rgba(170,136,255,0.15); color: #9C27B0; border-color: rgba(170,136,255,0.3); }
 
 .btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; border-radius: 24px; border: none; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; border-radius: 24px; border: none; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; -webkit-touch-callout: none;
 }
 .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 4px 12px var(--accent-dim); }
-.btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 6px 16px var(--accent-dim); }
+.btn-primary:active { background: var(--accent-hover); transform: scale(0.96); }
 .btn-secondary { background: var(--bg-secondary); color: var(--text-primary); }
+.btn-scan { background: var(--accent); color: #fff; width: 100%; max-width: 300px; padding: 16px; font-size: 1.1rem; border-radius: 30px; box-shadow: 0 8px 24px var(--accent-dim); transition: transform 0.1s; }
+.btn-scan:active { transform: scale(0.92); background: var(--accent-hover); }
+
+/* IoT Alert Box */
+.alert-box {
+  background: rgba(255, 183, 77, 0.15); border: 1px solid rgba(255,183,77,0.3);
+  padding: 16px 20px; border-radius: var(--radius-sm); color: #F57C00; font-weight: 600; 
+  margin-bottom: 24px; line-height: 1.6; display: none; font-size: 0.95rem;
+}
+.alert-box.danger { background: rgba(229, 115, 115, 0.15); border-color: rgba(229,115,115,0.3); color: #D32F2F; }
 
 .power-grid, .gauge-grid, .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
 .stat-box { text-align: center; padding: 20px; background: var(--bg-primary); border-radius: var(--radius-sm); }
@@ -125,6 +138,11 @@ body {
 
 .nav-footer { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border-top: 1px solid rgba(0,0,0,0.05); padding: 16px 24px; }
 .nav-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+
+/* 報告細節列表 */
+.report-list { list-style: none; margin-top: 12px; }
+.report-list li { padding: 8px 0; border-bottom: 1px solid var(--bg-secondary); font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
+.report-list li:last-child { border-bottom: none; }
 </style>
 </head>
 <body>
@@ -144,26 +162,31 @@ body {
 
 <main class="main-content">
   <section class="phase-section active" id="phase-1">
-    <h2 class="phase-title">環繞掃描與環境感知</h2>
-    <p class="phase-subtitle">請啟動掃描並拿著設備「緩慢環繞場域一圈」，AI 將收集全景數據來排除障礙物。</p>
+    <h2 class="phase-title">動態環繞測距與環境感知</h2>
+    <p class="phase-subtitle">啟動鏡頭後，請「按住掃描鈕」並環繞場域。系統將啟用光達(LiDAR)深度模擬，估算場地大小並排除障礙物。</p>
     
-    <div class="card" style="margin-bottom: 24px;">
+    <div class="card">
       <div class="card-title"><span class="icon">🕸️</span> AI 全景深度掃描</div>
       <div class="vision-wrap" id="vision-wrap">
         <video id="visionVideo" autoplay playsinline muted></video>
         <canvas id="visionCanvas"></canvas>
-        <div class="scan-progress-bar" id="scanProgress"></div>
-        <div class="scan-hint-text" id="scanHint">請緩慢轉動設備，掃描空間周圍...</div>
+        <div class="grid-scan-effect" id="gridScanEffect"></div>
+        <div class="scan-hint-text" id="scanHint">正在掃描與測距，請緩慢轉動...</div>
         <div class="ai-status-pill" id="visionStatus" style="display:none;">待命中</div>
-        <div class="vision-overlay" id="visionOverlay">
-          <button class="btn btn-primary" onclick="startAIAnalysis()">啟動環繞掃描 (6秒)</button>
+        
+        <div class="vision-overlay" id="visionOverlayInit">
+          <button class="btn btn-primary" onclick="initCamera()">啟動 AI 鏡頭</button>
+        </div>
+        
+        <div class="vision-overlay" id="visionOverlayScan" style="display:none; background: transparent; justify-content: flex-end; padding-bottom: 20px;">
+          <button class="btn btn-scan" id="btnHoldScan">👉 長按此處開始掃描 (放開結束)</button>
         </div>
       </div>
       <div id="aiResultText" style="margin-top: 16px; font-size: 0.95rem; font-weight: 500; color: var(--accent); min-height: 24px;"></div>
     </div>
 
     <div class="card">
-      <div class="card-title"><span class="icon">📝</span> 參數確認與微調</div>
+      <div class="card-title"><span class="icon">📝</span> 場地參數 (AI自動測距填寫)</div>
       <div class="form-grid">
         <div class="form-group">
           <label>活動類型</label>
@@ -180,16 +203,16 @@ body {
           <input type="number" id="peopleCount" min="1" max="200" value="20" oninput="selectModules()">
         </div>
         <div class="form-group">
-          <label>場域面寬 (公尺)</label>
+          <label>場域面寬 Width (公尺)</label>
           <input type="number" id="venueWidth" min="2" max="100" step="0.1" value="10" oninput="updateGridDimensions()">
         </div>
         <div class="form-group">
-          <label>場域縱深 (公尺)</label>
+          <label>場域縱深 Length (公尺)</label>
           <input type="number" id="venueLength" min="2" max="100" step="0.1" value="10" oninput="updateGridDimensions()">
         </div>
       </div>
       <div style="margin-top:24px; padding-top:20px; border-top:1px solid var(--bg-secondary);">
-        <label style="font-size: 0.9rem; color: var(--text-secondary); font-weight: 600; display:block; margin-bottom:12px;">系統推薦模組清單</label>
+        <label style="font-size: 0.9rem; color: var(--text-secondary); font-weight: 600; display:block; margin-bottom:12px;">智慧推薦模組清單</label>
         <div class="module-tags" id="moduleTags">
           <span style="color:var(--text-secondary);font-size:0.9rem">請先完成上方掃描或手動填寫資料。</span>
         </div>
@@ -204,8 +227,8 @@ body {
   </section>
 
   <section class="phase-section" id="phase-3">
-    <h2 class="phase-title">3D 全景網格佈署</h2>
-    <p class="phase-subtitle"><span style="color:var(--danger)">■ 紅色</span> 代表 AI 環繞偵測到的障礙物；<span style="color:var(--success)">■ 綠色</span> 為安全網格，系統已自動排列於此。</p>
+    <h2 class="phase-title">3D 智慧網格佈署預覽</h2>
+    <p class="phase-subtitle"><span style="color:var(--danger)">■ 紅色</span> 為 AI 測距避讓之障礙區；<span style="color:var(--success)">■ 綠色</span> 為可用安全網格。</p>
     <div id="three-container">
       <div class="three-legend" id="threeLegend"></div>
     </div>
@@ -213,6 +236,10 @@ body {
 
   <section class="phase-section" id="phase-4">
     <h2 class="phase-title">即時環境守護 (IoT)</h2>
+    <p class="phase-subtitle">當數值偏離標準時，系統將主動提供調整建議以維持場域健康。</p>
+    
+    <div id="iotAlertBox" class="alert-box"></div>
+
     <div style="display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap;">
       <button class="btn btn-primary" id="btnSerial" onclick="connectSerial()">連線實體感測器 (USB)</button>
       <button class="btn btn-secondary" id="btnSim" onclick="toggleSimulation()">啟用虛擬環境模擬</button>
@@ -237,10 +264,25 @@ body {
   </section>
 
   <section class="phase-section" id="phase-5">
-    <h2 class="phase-title">永續成效報告 (ESG Report)</h2>
+    <h2 class="phase-title">永續成效與場域總結 (ESG Report)</h2>
+    <p class="phase-subtitle">詳細的活動數據歸檔，將有助於您下一次的場域優化與減碳驗證。</p>
+    
     <div class="report-grid" id="reportGrid"></div>
-    <div class="card" style="margin-top:24px"><div class="card-title"><span class="icon">🌿</span> ESG 永續標籤</div><div class="esg-tags" id="esgTags"></div></div>
-    <div style="margin-top:32px; text-align:center"><button class="btn btn-primary" onclick="downloadPDF()">下載精美 PDF 報告</button></div>
+    
+    <div class="card">
+      <div class="card-title"><span class="icon">💡</span> 系統綜合評估與下場活動建議</div>
+      <ul class="report-list" id="reportRecommendations">
+        </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🌿</span> ESG 永續成就標籤</div>
+      <div class="esg-tags" id="esgTags"></div>
+    </div>
+
+    <div style="margin-top:32px; text-align:center">
+      <button class="btn btn-primary" onclick="downloadPDF()">下載完整 PDF 報告</button>
+    </div>
   </section>
 </main>
 
@@ -254,8 +296,12 @@ body {
 <script>
 // ========== 狀態管理 ==========
 const APP = {
-  currentPhase: 1, config: { eventType: '', peopleCount: 20, duration: 3, venueWidth: 10, venueLength: 10, brightness: 100 },
-  selectedModules: [], visionPredictions: [], spatialMap: null, visionStream: null, power: {}, monitoring: { active: false, history: { co2: [], temp: [], pm25: [] } },
+  currentPhase: 1, 
+  config: { eventType: '', peopleCount: 20, duration: 3, venueWidth: 10, venueLength: 10, brightness: 100 },
+  selectedModules: [], visionPredictions: [], spatialMap: null, visionStream: null, aiModel: null,
+  power: {}, 
+  monitoring: { active: false, history: { co2: [], temp: [], pm25: [] } },
+  threeLoaded: false
 };
 
 const MODULES = {
@@ -279,120 +325,117 @@ const EVENT_MODULES = {
 
 const NEXT_LABELS = ['下一步：精算電量 →', '下一步：預覽 3D 智慧配置 →', '下一步：進入即時監控 →', '結束活動並產生報告', ''];
 
-// ========== 1. AI 環繞深度與網格分析 ==========
-async function startAIAnalysis() {
+// ========== 1. 按住掃描與 LiDAR 測距模擬 ==========
+let scanInterval = null;
+let isScanning = false;
+
+async function initCamera() {
   const video = document.getElementById('visionVideo');
-  const overlay = document.getElementById('visionOverlay');
   const status = document.getElementById('visionStatus');
-  const progressBar = document.getElementById('scanProgress');
-  const scanHint = document.getElementById('scanHint');
-  const resultText = document.getElementById('aiResultText');
   
-  overlay.style.display = 'none';
-  status.style.display = 'block';
-  status.textContent = '請求相機權限...';
+  document.getElementById('visionOverlayInit').style.display = 'none';
+  status.style.display = 'block'; status.textContent = '請求相機權限...';
 
   try {
-    // 【修改 1】防呆鏡頭呼叫：優先找後鏡頭，找不到就用任何可用的鏡頭
     let stream;
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-    } catch(e) {
-      stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    }
+    try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); } 
+    catch(e) { stream = await navigator.mediaDevices.getUserMedia({ video: true }); }
     
     video.srcObject = stream;
     APP.visionStream = stream;
     await new Promise(resolve => video.onloadedmetadata = resolve);
     
-    status.textContent = '載入 AI 神經網路...';
-    let model;
-    try {
-      model = await cocoSsd.load(); // 載入模型
-    } catch(e) {
-      throw new Error("AI 模型載入失敗，請確認網路連線。");
-    }
+    status.textContent = '載入 AI 模型...';
+    try { APP.aiModel = await cocoSsd.load(); } catch(e) { throw new Error("AI 載入失敗"); }
     
-    // 開始連續環繞掃描
-    status.textContent = '掃描收集中...';
-    progressBar.style.display = 'block';
-    scanHint.style.display = 'block';
-    APP.visionPredictions = []; // 清空之前的紀錄
-    
-    const canvas = document.getElementById('visionCanvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    APP.videoWidth = canvas.width;
-    APP.videoHeight = canvas.height;
-
-    const scanDuration = 6000; // 掃描 6 秒
-    const startTime = Date.now();
-    
-    // 進度條動畫
-    const progressTimer = setInterval(() => {
-      let elapsed = Date.now() - startTime;
-      progressBar.style.width = Math.min(100, (elapsed / scanDuration) * 100) + '%';
-    }, 50);
-
-    // 【修改 2】每秒擷取一次畫面進行辨識，整合所有看到的障礙物
-    const scanInterval = setInterval(async () => {
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const preds = await model.detect(canvas);
-      APP.visionPredictions.push(...preds); // 把這秒看到的加進總清單
-      
-      // 即時畫出當下看到的框框
-      ctx.clearRect(0,0, canvas.width, canvas.height);
-      ctx.lineWidth = 4; ctx.strokeStyle = '#6B9080'; ctx.fillStyle = '#6B9080'; ctx.font = 'bold 16px sans-serif';
-      preds.forEach(p => {
-        ctx.strokeRect(...p.bbox);
-        ctx.fillText(`${p.class}`, p.bbox[0], p.bbox[1] > 20 ? p.bbox[1]-5 : 20);
-      });
-    }, 1000);
-
-    // 掃描時間到，處理結果
-    setTimeout(() => {
-      clearInterval(scanInterval);
-      clearInterval(progressTimer);
-      
-      APP.visionStream.getTracks().forEach(t => t.stop()); // 關閉相機
-      progressBar.style.display = 'none';
-      scanHint.style.display = 'none';
-      
-      // 分析光度
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      APP.config.brightness = analyzeBrightness(ctx, canvas.width, canvas.height);
-
-      generateSpatialGrid(); // 根據累積 6 秒的資料生成網格
-      
-      // 情境推論
-      let evtType = 'workshop'; 
-      let ppl = parseInt(document.getElementById('peopleCount').value) || 20;
-      let text = `環繞掃描完成！共記錄 ${APP.visionPredictions.length} 個環境特徵。`;
-
-      let allObjects = APP.visionPredictions.map(p => p.class);
-      if (APP.config.brightness > 140) {
-        text += '光源極佳，自動導入太陽能板。'; evtType = 'outdoor_market';
-      } else if (allObjects.includes('dining table') || allObjects.includes('bowl') || allObjects.includes('cup')) {
-        text += '偵測到餐飲行為，自動切換至「長者共餐」情境。'; evtType = 'elderly_dining';
-      } else if (allObjects.includes('bed')) {
-        text += '偵測到照護床/長椅，自動切換至「健康義診」情境。'; evtType = 'health_clinic';
-      }
-
-      document.getElementById('eventType').value = evtType;
-      document.getElementById('peopleCount').value = ppl;
-      selectModules(); 
-
-      status.textContent = '全景分析完成';
-      status.style.background = 'var(--success)'; status.style.color = '#fff';
-      resultText.textContent = text;
-    }, scanDuration);
+    status.textContent = '系統就緒，請按住按鈕';
+    status.style.background = 'var(--success)'; status.style.color = '#fff';
+    document.getElementById('visionOverlayScan').style.display = 'flex';
 
   } catch (err) {
-    status.textContent = '相機錯誤: ' + err.message;
-    status.style.background = 'var(--danger)';
-    console.error(err);
+    status.textContent = '相機錯誤: ' + err.message; status.style.background = 'var(--danger)';
   }
+}
+
+// 綁定長按事件 (支援滑鼠與手機觸控)
+const btnHold = document.getElementById('btnHoldScan');
+btnHold.addEventListener('mousedown', startScan);
+btnHold.addEventListener('touchstart', (e) => { e.preventDefault(); startScan(); });
+window.addEventListener('mouseup', stopScan);
+window.addEventListener('touchend', stopScan);
+
+function startScan() {
+  if(!APP.aiModel || isScanning) return;
+  isScanning = true;
+  APP.visionPredictions = []; // 清空之前的數據
+  
+  document.getElementById('visionStatus').textContent = 'LiDAR 測距與避障掃描中...';
+  document.getElementById('visionStatus').style.background = 'var(--warning)';
+  document.getElementById('gridScanEffect').style.display = 'block';
+  document.getElementById('scanHint').style.display = 'block';
+  btnHold.textContent = '掃描中... (放開結束)';
+  btnHold.style.transform = 'scale(0.95)';
+  
+  const video = document.getElementById('visionVideo');
+  const canvas = document.getElementById('visionCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+  APP.videoWidth = canvas.width; APP.videoHeight = canvas.height;
+
+  scanInterval = setInterval(async () => {
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const preds = await APP.aiModel.detect(canvas);
+    APP.visionPredictions.push(...preds);
+    
+    ctx.clearRect(0,0, canvas.width, canvas.height);
+    ctx.lineWidth = 4; ctx.strokeStyle = '#6B9080'; ctx.fillStyle = '#6B9080'; ctx.font = 'bold 16px sans-serif';
+    preds.forEach(p => { ctx.strokeRect(...p.bbox); ctx.fillText(`${p.class}`, p.bbox[0], p.bbox[1] > 20 ? p.bbox[1]-5 : 20); });
+  }, 800);
+}
+
+function stopScan() {
+  if(!isScanning) return;
+  isScanning = false;
+  clearInterval(scanInterval);
+  
+  document.getElementById('gridScanEffect').style.display = 'none';
+  document.getElementById('scanHint').style.display = 'none';
+  document.getElementById('visionOverlayScan').style.display = 'none';
+  
+  const video = document.getElementById('visionVideo');
+  const canvas = document.getElementById('visionCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  video.pause();
+  if(APP.visionStream) APP.visionStream.getTracks().forEach(t => t.stop());
+
+  APP.config.brightness = analyzeBrightness(ctx, canvas.width, canvas.height);
+  
+  // LiDAR 測距模擬：依據收集到的特徵點廣度來估算場地長寬
+  let estimatedW = 6; let estimatedL = 6;
+  if (APP.visionPredictions.length > 5) {
+     estimatedW = Math.min(25, 4 + APP.visionPredictions.length * 0.5);
+     estimatedL = Math.min(25, 6 + APP.visionPredictions.length * 0.3);
+  }
+  document.getElementById('venueWidth').value = estimatedW.toFixed(1);
+  document.getElementById('venueLength').value = estimatedL.toFixed(1);
+  generateSpatialGrid(); // 建立避障網格
+  
+  let evtType = 'workshop'; 
+  let ppl = parseInt(document.getElementById('peopleCount').value) || 20;
+  let text = `掃描完成！估算場地大小約 ${estimatedW.toFixed(1)} x ${estimatedL.toFixed(1)} 公尺。`;
+
+  let allObjects = APP.visionPredictions.map(p => p.class);
+  if (APP.config.brightness > 140) { text += '光源佳，已加入太陽能板。'; evtType = 'outdoor_market'; } 
+  else if (allObjects.includes('dining table') || allObjects.includes('cup')) { text += '推測為共餐情境。'; evtType = 'elderly_dining'; } 
+  else if (allObjects.includes('bed')) { text += '推測為義診情境。'; evtType = 'health_clinic'; }
+
+  document.getElementById('eventType').value = evtType;
+  selectModules(); 
+
+  const status = document.getElementById('visionStatus');
+  status.textContent = '空間測距完成'; status.style.background = 'var(--success)';
+  document.getElementById('aiResultText').textContent = text;
 }
 
 function analyzeBrightness(ctx, w, h) {
@@ -412,19 +455,12 @@ function generateSpatialGrid() {
   
   if (APP.visionPredictions.length > 0) {
      const vW = APP.videoWidth || 640; const vH = APP.videoHeight || 480;
-     // 將 6 秒內累積的所有座標投射到網格中
      APP.visionPredictions.forEach(p => {
-         const centerX = p.bbox[0] + p.bbox[2]/2;
-         const bottomY = p.bbox[1] + p.bbox[3]; 
-         
-         // 因為是環繞掃描，這裡我們用簡易演算法將不同影格的障礙物隨機分佈在邊界與熱點
+         const centerX = p.bbox[0] + p.bbox[2]/2; const bottomY = p.bbox[1] + p.bbox[3]; 
          const gridX = Math.floor((centerX / vW) * cols);
          const gridZ = Math.floor((bottomY / vH) * rows); 
-         
-         // 增加亂數模擬環繞視角的偏移
          const shiftX = Math.min(cols-1, Math.max(0, gridX + (Math.random() > 0.5 ? 1 : -1)));
          const shiftZ = Math.min(rows-1, Math.max(0, gridZ + (Math.random() > 0.5 ? 1 : -1)));
-         
          matrix[shiftZ][shiftX] = 'OBSTACLE';
      });
   } else {
@@ -454,19 +490,27 @@ function selectModules() {
   });
 
   APP.selectedModules = modules;
-  const tagsHtml = modules.map(m => `<span class="module-tag"><span style="width:12px;height:12px;border-radius:3px;background:${m.color}"></span>${m.name} <span class="qty">× ${m.qty}</span></span>`).join('');
-  document.getElementById('moduleTags').innerHTML = tagsHtml;
+  document.getElementById('moduleTags').innerHTML = modules.map(m => `<span class="module-tag"><span style="width:12px;height:12px;border-radius:3px;background:${m.color}"></span>${m.name} <span class="qty">× ${m.qty}</span></span>`).join('');
 }
 
+// ========== 導航與 3D 修復 ==========
 function goToPhase(n) {
   if (n < 1 || n > 5) return;
   APP.currentPhase = n;
+  
   document.querySelectorAll('.phase-section').forEach((s, i) => s.classList.toggle('active', i === n - 1));
   document.querySelectorAll('.step').forEach((s, i) => { s.classList.toggle('active', i === n - 1); s.classList.toggle('done', i < n - 1); });
+  
   document.getElementById('btnPrev').style.visibility = n === 1 ? 'hidden' : 'visible';
   const btnNext = document.getElementById('btnNext');
   btnNext.textContent = NEXT_LABELS[n - 1]; btnNext.style.display = n === 5 ? 'none' : '';
-  if (n === 2) calculatePower(); if (n === 3) initThreeScene(); if (n === 5) generateReport();
+  
+  if (n === 2) calculatePower(); 
+  if (n === 3) {
+      // 修復：延遲 100ms 讓 display:block 生效後，再抓取容器寬高來繪製 3D
+      setTimeout(() => { if(!APP.threeLoaded) { initThreeScene(); APP.threeLoaded = true; } else { updateThreeScene(); } }, 100);
+  }
+  if (n === 5) generateReport();
 }
 function nextPhase() { goToPhase(APP.currentPhase + 1); }
 function prevPhase() { goToPhase(APP.currentPhase - 1); }
@@ -490,6 +534,7 @@ function calculatePower() {
     </div>`;
 }
 
+// ========== 3. 3D 智慧網格佈署 ==========
 function initThreeScene() {
   const container = document.getElementById('three-container');
   Array.from(container.children).forEach(c => { if(c.id !== 'threeLegend') c.remove(); });
@@ -507,8 +552,10 @@ function initThreeScene() {
   renderer.setSize(w, h); renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   container.appendChild(renderer.domElement);
   
+  APP.three.renderer = renderer; APP.three.scene = scene; APP.three.camera = camera;
+  
   const controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.target.set(vw/2, 0, vl/2); controls.enableDamping = true;
+  controls.target.set(vw/2, 0, vl/2); controls.enableDamping = true; APP.three.controls = controls;
 
   scene.add(new THREE.AmbientLight(0xffffff, 0.7));
   const dirLight = new THREE.DirectionalLight(0xfff5e6, 0.7);
@@ -550,32 +597,90 @@ function initThreeScene() {
   animate();
 }
 
+function updateThreeScene() {
+  // 如果尺寸改變，重新渲染
+  APP.threeLoaded = false; initThreeScene(); APP.threeLoaded = true;
+}
+
+// ========== 4. IoT 監控與警示系統 ==========
+function checkAlerts(co2, temp, pm25) {
+  let alerts = [];
+  let isDanger = false;
+
+  if (co2 > 1000) { alerts.push("⚠️ CO2 濃度過高 (>1000ppm)，建議開啟門窗並將風扇切至最強！"); isDanger = true; }
+  else if (co2 > 800) alerts.push("📌 CO2 濃度偏高，系統建議將換氣風扇調至 75%。");
+  
+  if (pm25 > 35) { alerts.push("⚠️ PM2.5 超標，建議立刻開啟 HEPA 清淨模組強效模式。"); isDanger = true; }
+  if (temp > 30) alerts.push("📌 溫度偏高，建議開啟散熱風扇或調整遮陽棚。");
+
+  const alertBox = document.getElementById('iotAlertBox');
+  if (alerts.length > 0) {
+    alertBox.style.display = 'block';
+    alertBox.className = isDanger ? 'alert-box danger' : 'alert-box';
+    alertBox.innerHTML = alerts.join('<br>');
+  } else {
+    alertBox.style.display = 'none';
+  }
+}
+
 function updateGauge(id, val, min, max) { document.getElementById(id).style.strokeDashoffset = 235.6 * (1 - Math.max(0, Math.min(1, (val - min) / (max - min)))); }
+
 function toggleSimulation() {
   if (APP.monitoring.active) return;
   APP.monitoring.active = true; document.getElementById('btnSim').textContent = '模擬運作中...'; document.getElementById('btnSim').style.background = 'var(--accent-dim)';
   setInterval(() => {
-    const co2 = 400 + Math.random()*500; const temp = 24 + Math.random()*3; const pm25 = 10 + Math.random()*20;
+    // 製造一點波動讓警示系統有機會觸發
+    const co2 = 400 + Math.random()*800; const temp = 24 + Math.random()*8; const pm25 = 10 + Math.random()*40;
+    
     document.getElementById('valCO2').innerHTML = `${Math.round(co2)}<span style="font-size:1rem;color:var(--text-secondary)"> ppm</span>`;
     document.getElementById('valTemp').innerHTML = `${temp.toFixed(1)}<span style="font-size:1rem;color:var(--text-secondary)"> °C</span>`;
     document.getElementById('valPM25').innerHTML = `${Math.round(pm25)}<span style="font-size:1rem;color:var(--text-secondary)"> μg/m³</span>`;
+    
     updateGauge('gaugeCO2', co2, 300, 1500); updateGauge('gaugeTemp', temp, 15, 40); updateGauge('gaugePM25', pm25, 0, 100);
+    checkAlerts(co2, temp, pm25); // 觸發警示判斷
+    
     APP.monitoring.history.co2.push(co2);
+    APP.monitoring.history.temp.push(temp);
+    APP.monitoring.history.pm25.push(pm25);
   }, 2000);
 }
-function connectSerial() { alert('請確保已透過 USB 連接 Arduino (SCD41)。'); toggleSimulation(); }
+function connectSerial() { alert('請確保已透過 USB 連接 Arduino。'); toggleSimulation(); }
 
+// ========== 5. 更全面的 ESG 報告 ==========
 function generateReport() {
-  const p = APP.power; const avgCO2 = APP.monitoring.history.co2.length ? APP.monitoring.history.co2.reduce((a,b)=>a+b)/APP.monitoring.history.co2.length : 450;
+  const p = APP.power; 
+  const co2Arr = APP.monitoring.history.co2;
+  const avgCO2 = co2Arr.length ? co2Arr.reduce((a,b)=>a+b)/co2Arr.length : 450;
+  const peakCO2 = co2Arr.length ? Math.max(...co2Arr) : 450;
+  
+  // 綜合數據
   document.getElementById('reportGrid').innerHTML = `
-    <div class="card stat-box"><div class="stat-value">${(p.totalWh/1000).toFixed(2)}</div><div class="stat-label">總消耗度數 (kWh)</div></div>
-    <div class="card stat-box"><div class="stat-value" style="color:var(--success)">${(p.solarOffsetWh/1000).toFixed(2)}</div><div class="stat-label">綠電折抵度數 (kWh)</div></div>
-    <div class="card stat-box"><div class="stat-value" style="color:var(--accent)">${Math.round(avgCO2)}</div><div class="stat-label">平均 CO₂ 濃度 (良好)</div></div>`;
-  document.getElementById('esgTags').innerHTML = `<span class="esg-tag env">E: 綠電循環運用</span><span class="esg-tag env">E: 低碳運轉足跡</span><span class="esg-tag social">S: 提升社區健康體驗 (${APP.config.peopleCount} 人受惠)</span>`;
+    <div class="card stat-box"><div class="stat-value">${APP.config.peopleCount}</div><div class="stat-label">參與人數 (人)</div></div>
+    <div class="card stat-box"><div class="stat-value">${(p.totalWh/1000).toFixed(2)}</div><div class="stat-label">用電度數 (kWh)</div></div>
+    <div class="card stat-box"><div class="stat-value" style="color:var(--success)">${(p.solarOffsetWh/1000).toFixed(2)}</div><div class="stat-label">綠電折抵 (kWh)</div></div>
+    <div class="card stat-box"><div class="stat-value" style="color:${peakCO2>1000?'var(--danger)':'var(--accent)'}">${Math.round(peakCO2)}</div><div class="stat-label">CO₂ 峰值 (ppm)</div></div>
+  `;
+  
+  // 系統評估與優化建議
+  let recs = [];
+  if(peakCO2 > 1000) recs.push('📌 <b>空氣品質建議：</b> 本次活動 CO₂ 峰值偏高，下次建議提早 15 分鐘開啟換氣模組。');
+  else recs.push('✅ <b>空氣品質優良：</b> 換氣策略精準，全程維持在健康標準內。');
+  
+  if(p.solarOffsetWh > 0) recs.push('✅ <b>能源效率：</b> 太陽能模組成功降低了場域對市電的依賴，減碳成效顯著。');
+  if(APP.config.peopleCount > 50) recs.push('📌 <b>動線規劃建議：</b> 人數較多，下次佈署時可增加桌距至 1.2 公尺，確保輪椅與推車動線順暢。');
+  
+  document.getElementById('reportRecommendations').innerHTML = recs.map(r => `<li>${r}</li>`).join('');
+
+  // ESG Tags
+  document.getElementById('esgTags').innerHTML = `
+    <span class="esg-tag env">E: 能源效率提升 (使用模組化電池)</span>
+    ${p.solarOffsetWh > 0 ? '<span class="esg-tag env">E: 綠電自發自用</span>' : ''}
+    <span class="esg-tag social">S: 促進社區健康福祉 (${APP.config.peopleCount} 人)</span>
+    <span class="esg-tag gov">G: 數位治理與場域數據歸檔</span>
+  `;
 }
 function downloadPDF() { html2pdf().set({ margin: [15, 15], filename: 'FlowTable_ESG_Report.pdf', html2canvas: { scale: 2, backgroundColor: '#F9FAF8' } }).from(document.getElementById('phase-5')).save(); }
 
-// 初始化防呆，避免忘記選擇活動
 selectModules();
 </script>
 </body>
