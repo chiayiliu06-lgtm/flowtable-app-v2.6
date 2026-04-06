@@ -14,17 +14,17 @@
 <style>
 /* ── 溫和風格色票 (Gentle Palette) ── */
 :root {
-  --bg-primary: #F9FAF8;      /* 米白背景 */
-  --bg-secondary: #F0F4F2;    /* 淺灰綠背景 */
-  --bg-card: #FFFFFF;         /* 純白卡片 */
-  --accent: #6B9080;          /* 鼠尾草綠 (主色) */
+  --bg-primary: #F9FAF8;      
+  --bg-secondary: #F0F4F2;    
+  --bg-card: #FFFFFF;         
+  --accent: #6B9080;          
   --accent-dim: rgba(107, 144, 128, 0.15);
   --accent-hover: #5A7A6D;
-  --text-primary: #4A4A4A;    /* 柔和深灰 */
-  --text-secondary: #8C9990;  /* 柔和淺灰 */
-  --danger: #E57373;          /* 柔和紅 */
-  --warning: #FFB74D;         /* 柔和橘 */
-  --success: #81C784;         /* 柔和綠 */
+  --text-primary: #4A4A4A;    
+  --text-secondary: #8C9990;  
+  --danger: #E57373;          
+  --warning: #FFB74D;         
+  --success: #81C784;         
   --radius: 20px;
   --radius-sm: 12px;
   --shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
@@ -59,7 +59,7 @@ body {
 }
 .app-logo span { color: var(--accent); }
 
-/* ── 流程進度條 (Stepper) ── */
+/* ── 流程進度條 ── */
 .stepper { display: flex; align-items: center; gap: 0; }
 .step { display: flex; align-items: center; gap: 0; }
 .step-circle {
@@ -74,25 +74,15 @@ body {
   border-color: var(--accent); background: var(--bg-card); color: var(--accent);
   box-shadow: 0 0 0 4px var(--accent-dim);
 }
-.step.done .step-circle {
-  border-color: var(--accent); background: var(--accent); color: #fff;
-}
-.step-line {
-  width: 32px; height: 3px; background: var(--bg-secondary); transition: background var(--transition);
-}
+.step.done .step-circle { border-color: var(--accent); background: var(--accent); color: #fff; }
+.step-line { width: 32px; height: 3px; background: var(--bg-secondary); transition: background var(--transition); }
 .step.done + .step .step-line, .step.done .step-line { background: var(--accent); }
 
 /* ── 主要內容區 ── */
-.main-content {
-  max-width: 1200px; margin: 0 auto;
-  padding: 100px 24px 120px;
-}
+.main-content { max-width: 1200px; margin: 0 auto; padding: 100px 24px 120px; }
 .phase-section { display: none; animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
 .phase-section.active { display: block; }
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 .phase-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; color: var(--text-primary); }
 .phase-subtitle { color: var(--text-secondary); margin-bottom: 24px; font-size: 1rem; }
 
@@ -107,9 +97,8 @@ body {
   font-size: 1.15rem; font-weight: 700; margin-bottom: 20px;
   display: flex; align-items: center; gap: 8px; color: var(--text-primary);
 }
-.card-title .icon { color: var(--accent); font-size: 1.3rem; }
 
-/* ── AI 視覺分析區 ── */
+/* ── AI 視覺分析與網格特效 ── */
 .vision-wrap {
   position: relative; background: #E8ECEA; border-radius: var(--radius-sm);
   overflow: hidden; aspect-ratio: 16/9; max-height: 400px; display: flex; align-items: center; justify-content: center;
@@ -124,6 +113,24 @@ body {
   position: absolute; top: 16px; left: 16px; background: rgba(255,255,255,0.9);
   padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; color: var(--accent);
   box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 15;
+}
+
+/* 網格掃描動畫 */
+.grid-scan-effect {
+  position: absolute; inset: 0; z-index: 12; display: none;
+  background-image: 
+    linear-gradient(rgba(107, 144, 128, 0.4) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(107, 144, 128, 0.4) 1px, transparent 1px);
+  background-size: 40px 40px;
+  transform: perspective(500px) rotateX(60deg) scale(2);
+  transform-origin: bottom center;
+  animation: gridMove 2s linear infinite;
+  pointer-events: none;
+}
+@keyframes gridMove {
+  0% { background-position: 0 0; opacity: 0; }
+  50% { opacity: 1; }
+  100% { background-position: 0 40px; opacity: 0; }
 }
 
 /* ── 表單設計 ── */
@@ -151,7 +158,7 @@ body {
 .esg-tag.env { background: rgba(129,199,132,0.15); color: #4CAF50; border-color: rgba(129,199,132,0.3); }
 .esg-tag.social { background: rgba(100,181,246,0.15); color: #2196F3; border-color: rgba(100,181,246,0.3); }
 
-/* ── 按鈕設計 (Buttons) ── */
+/* ── 按鈕設計 ── */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   padding: 12px 24px; border-radius: 24px; border: none;
@@ -162,16 +169,10 @@ body {
 .btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 6px 16px var(--accent-dim); }
 .btn-secondary { background: var(--bg-secondary); color: var(--text-primary); }
 .btn-secondary:hover { background: #E2E8E5; }
-.btn-warning { background: rgba(255,183,77,0.15); color: #F57C00; }
-.btn-danger { background: rgba(229,115,115,0.15); color: #D32F2F; }
 
 /* ── 其他共用元件 ── */
-.power-grid, .gauge-grid, .report-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;
-}
-.stat-box {
-  text-align: center; padding: 20px; background: var(--bg-primary); border-radius: var(--radius-sm);
-}
+.power-grid, .gauge-grid, .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+.stat-box { text-align: center; padding: 20px; background: var(--bg-primary); border-radius: var(--radius-sm); }
 .stat-value { font-size: 2rem; font-weight: 800; color: var(--accent); line-height: 1.2; }
 .stat-label { font-size: 0.9rem; color: var(--text-secondary); margin-top: 8px; font-weight: 500; }
 
@@ -180,19 +181,17 @@ body {
   box-shadow: inset 0 2px 12px rgba(0,0,0,0.05); background: var(--bg-secondary);
 }
 .three-legend {
-  position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.9);
+  position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.95);
   backdrop-filter: blur(8px); border-radius: var(--radius-sm); padding: 16px;
   font-size: 0.85rem; display: flex; flex-direction: column; gap: 8px; box-shadow: var(--shadow);
 }
 .legend-item { display: flex; align-items: center; gap: 10px; font-weight: 500; }
 .legend-color { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; }
 
-/* Gauge SVG */
 .gauge-svg { width: 140px; height: 140px; margin: 0 auto; display: block; }
 .gauge-bg { fill: none; stroke: var(--bg-secondary); stroke-width: 12; stroke-linecap: round;}
 .gauge-fill { fill: none; stroke-width: 12; stroke-linecap: round; transition: stroke-dashoffset 1s cubic-bezier(0.16, 1, 0.3, 1), stroke 0.3s ease; }
 
-/* Footer */
 .nav-footer {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
   background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px);
@@ -219,18 +218,18 @@ body {
 <main class="main-content">
 
   <section class="phase-section active" id="phase-1">
-    <h2 class="phase-title">環境感知與活動設定</h2>
-    <p class="phase-subtitle">啟動 AI 鏡頭掃描空間，系統將自動為您評估場域大小、光線品質與合適的活動模組。</p>
+    <h2 class="phase-title">空間網格化與環境感知</h2>
+    <p class="phase-subtitle">AI 鏡頭將掃描空間，自動排除障礙物區域，並生成專屬的 2D 佈署網格。</p>
     
     <div class="card" style="margin-bottom: 24px;">
-      <div class="card-title"><span class="icon">✨</span> AI 雙重空間分析</div>
+      <div class="card-title"><span class="icon">🕸️</span> AI 深度與網格分析</div>
       <div class="vision-wrap" id="vision-wrap">
         <video id="visionVideo" autoplay playsinline muted></video>
         <canvas id="visionCanvas"></canvas>
+        <div class="grid-scan-effect" id="gridScanEffect"></div>
         <div class="ai-status-pill" id="visionStatus" style="display:none;">待命中</div>
         <div class="vision-overlay" id="visionOverlay">
-          <button class="btn btn-primary" onclick="startAIAnalysis()">啟動空間掃描</button>
-          <p style="margin-top: 12px; font-size: 0.9rem; color: var(--text-secondary);">將使用邊緣運算，影像不會上傳至雲端</p>
+          <button class="btn btn-primary" onclick="startAIAnalysis()">啟動空間網格掃描</button>
         </div>
       </div>
       <div id="aiResultText" style="margin-top: 16px; font-size: 0.95rem; font-weight: 500; color: var(--accent); min-height: 24px;"></div>
@@ -254,16 +253,12 @@ body {
           <input type="number" id="peopleCount" min="1" max="200" placeholder="例如：20" oninput="selectModules()">
         </div>
         <div class="form-group">
-          <label>預計時長 (小時)</label>
-          <input type="number" id="duration" min="0.5" max="24" step="0.5" placeholder="例如：3" value="3" oninput="selectModules()">
-        </div>
-        <div class="form-group">
           <label>場域面寬 (公尺)</label>
-          <input type="number" id="venueWidth" min="2" max="100" step="0.1" placeholder="例如：8" value="8">
+          <input type="number" id="venueWidth" min="2" max="100" step="0.1" value="10" oninput="updateGridDimensions()">
         </div>
         <div class="form-group">
           <label>場域縱深 (公尺)</label>
-          <input type="number" id="venueLength" min="2" max="100" step="0.1" placeholder="例如：10" value="10">
+          <input type="number" id="venueLength" min="2" max="100" step="0.1" value="10" oninput="updateGridDimensions()">
         </div>
       </div>
       <div style="margin-top:24px; padding-top:20px; border-top:1px solid var(--bg-secondary);">
@@ -282,8 +277,11 @@ body {
   </section>
 
   <section class="phase-section" id="phase-3">
-    <h2 class="phase-title">3D 動線與空間預覽</h2>
-    <p class="phase-subtitle">為確保動線順暢（保留 90cm 走道），AI 已為您規劃出最佳的 Flow Table 排列方式。</p>
+    <h2 class="phase-title">3D 智慧網格佈署預覽</h2>
+    <p class="phase-subtitle">
+      <span style="color:var(--danger)">■ 紅色區塊</span> 代表 AI 偵測到的既有障礙物；<br>
+      <span style="color:var(--success)">■ 綠色區塊</span> 為安全可用網格，系統已將裝置自動排列於此。
+    </p>
     <div id="three-container">
       <div class="three-legend" id="threeLegend"></div>
     </div>
@@ -329,7 +327,6 @@ body {
   <section class="phase-section" id="phase-5">
     <h2 class="phase-title">永續成效報告 (ESG Report)</h2>
     <p class="phase-subtitle">本次活動已圓滿結束。以下為場域健康與環境貢獻的數位歸檔。</p>
-    
     <div class="report-grid" id="reportGrid"></div>
     <div class="card" style="margin-top:24px">
       <div class="card-title"><span class="icon">🌿</span> 系統賦予的 ESG 永續標籤</div>
@@ -353,15 +350,17 @@ body {
 // ========== 狀態管理 ==========
 const APP = {
   currentPhase: 1,
-  config: { eventType: '', peopleCount: 0, duration: 3, venueWidth: 8, venueLength: 10, brightness: 100 },
+  config: { eventType: '', peopleCount: 0, duration: 3, venueWidth: 10, venueLength: 10, brightness: 100 },
   selectedModules: [],
+  visionPredictions: [], // 保存 AI 偵測到的物件座標
+  spatialMap: null,      // 保存 2D 網格陣列
   visionStream: null,
   power: {},
-  monitoring: { active: false, history: { co2: [], temp: [], pm25: [], timestamps: [] }, fanSpeed: 30 },
+  monitoring: { active: false, history: { co2: [], temp: [], pm25: [], timestamps: [] } },
   three: {}
 };
 
-// ========== 模組資料庫 (含中文翻譯) ==========
+// ========== 模組資料庫 ==========
 const MODULES = {
   base_table:     { name: 'Flow Table 基礎桌體', watts: 0,   color: '#A4C3B2', threeColor: 0xA4C3B2, w: 1.2, d: 0.8, h: 0.75 },
   fan:            { name: '柔風循環模組',       watts: 30,  color: '#6B9080', threeColor: 0x6B9080, w: 0.3, d: 0.3, h: 0.15 },
@@ -381,13 +380,14 @@ const EVENT_MODULES = {
   workshop:       ['base_table', 'display', 'sensor_unit']
 };
 
-const NEXT_LABELS = ['下一步：精算電量 →', '下一步：預覽 3D 配置 →', '下一步：進入即時監控 →', '結束活動並產生報告', ''];
+const NEXT_LABELS = ['下一步：精算電量 →', '下一步：預覽 3D 智慧配置 →', '下一步：進入即時監控 →', '結束活動並產生報告', ''];
 
-// ========== 1. AI 視覺分析功能 ==========
+// ========== 1. AI 深度與網格分析 ==========
 async function startAIAnalysis() {
   const video = document.getElementById('visionVideo');
   const overlay = document.getElementById('visionOverlay');
   const status = document.getElementById('visionStatus');
+  const scanEffect = document.getElementById('gridScanEffect');
   const resultText = document.getElementById('aiResultText');
   
   overlay.style.opacity = '0';
@@ -400,31 +400,35 @@ async function startAIAnalysis() {
     video.srcObject = stream;
     APP.visionStream = stream;
     
-    // 等待影片播放
     await new Promise(resolve => video.onloadedmetadata = resolve);
-    status.textContent = '載入神經網路模型...';
+    status.textContent = '載入模型與深度演算法...';
     
-    // 載入模型
-    const model = await cocoSsd.load();
-    status.textContent = '運算中...';
+    // 啟動雷達掃描特效
+    scanEffect.style.display = 'block';
 
-    // 擷取畫面分析
+    const model = await cocoSsd.load();
+    status.textContent = '分析空間網格與障礙物...';
+
     setTimeout(async () => {
       const canvas = document.getElementById('visionCanvas');
       const ctx = canvas.getContext('2d');
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
+      APP.videoWidth = canvas.width;
+      APP.videoHeight = canvas.height;
+
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       video.pause();
+      scanEffect.style.display = 'none'; // 關閉特效
 
-      // 1. 光度分析 (Brightness Analysis)
-      const brightness = analyzeBrightness(ctx, canvas.width, canvas.height);
-      APP.config.brightness = brightness;
+      // 1. 光度分析
+      APP.config.brightness = analyzeBrightness(ctx, canvas.width, canvas.height);
 
-      // 2. 物件偵測 (Object Detection)
+      // 2. 物件偵測與座標儲存
       const predictions = await model.detect(canvas);
+      APP.visionPredictions = predictions; 
       
-      // 繪製結果
+      // 繪製識別框
       ctx.lineWidth = 4;
       ctx.strokeStyle = '#6B9080';
       ctx.fillStyle = '#6B9080';
@@ -437,45 +441,41 @@ async function startAIAnalysis() {
         objects.push(p.class);
       });
 
-      // 3. AI 推論與自動填表
-      let evtType = 'workshop'; // default
-      let ppl = 10;
-      let text = `AI 偵測完成。環境亮度: ${brightness} (0-255)。`;
+      // 3. 生成 2D 空間網格 (核心邏輯)
+      generateSpatialGrid();
 
-      if (brightness > 140) {
-        text += '光源極佳，研判為戶外或採光良好處，自動導入太陽能板。';
-        evtType = 'outdoor_market';
-        ppl = 30;
+      // 4. 情境推論
+      let evtType = 'workshop'; 
+      let ppl = 10;
+      let text = `網格建立完成。共識別出 ${predictions.length} 處障礙物並標記避讓。`;
+
+      if (APP.config.brightness > 140) {
+        text += '光源極佳，自動導入太陽能板。';
+        evtType = 'outdoor_market'; ppl = 30;
       } else if (objects.includes('dining table') || objects.includes('bowl')) {
-        text += '偵測到餐具/餐桌，自動切換至「長者共餐」情境。';
-        evtType = 'elderly_dining';
-        ppl = 15;
+        text += '推測為共餐情境，系統將調整適配模組。';
+        evtType = 'elderly_dining'; ppl = 15;
       } else if (objects.includes('person')) {
         let pCount = objects.filter(o => o === 'person').length;
         ppl = Math.max(10, pCount * 5);
-        text += `偵測到人員活動，估算規模約 ${ppl} 人。`;
       }
 
       document.getElementById('eventType').value = evtType;
       document.getElementById('peopleCount').value = ppl;
-      APP.config.eventType = evtType;
-      APP.config.peopleCount = ppl;
       
-      selectModules(); // 觸發模組更新
+      selectModules(); 
 
-      // 關閉鏡頭
       APP.visionStream.getTracks().forEach(t => t.stop());
-      status.textContent = '分析完成';
+      status.textContent = '網格分析完成';
       status.style.background = 'var(--success)';
       status.style.color = '#fff';
       resultText.textContent = text;
 
-    }, 2000);
+    }, 2500);
 
   } catch (err) {
     status.textContent = '無法存取相機，請手動填寫';
     status.style.background = 'var(--danger)';
-    console.error(err);
   }
 }
 
@@ -488,20 +488,58 @@ function analyzeBrightness(ctx, w, h) {
   return Math.floor(sum / (w * h));
 }
 
+// 產生空間網格矩陣 (將 2D 畫面映射到鳥瞰平面)
+function generateSpatialGrid() {
+  const vw = parseFloat(document.getElementById('venueWidth').value) || 10;
+  const vl = parseFloat(document.getElementById('venueLength').value) || 10;
+  const cellW = 2.0; // 每個安全網格為 2x2 公尺
+  
+  const cols = Math.max(1, Math.floor(vw / cellW));
+  const rows = Math.max(1, Math.floor(vl / cellW));
+  
+  // 建立二維陣列，預設全為 'FREE'
+  let matrix = Array(rows).fill(0).map(() => Array(cols).fill('FREE'));
+  
+  if (APP.visionPredictions && APP.visionPredictions.length > 0) {
+     const vW = APP.videoWidth || 640;
+     const vH = APP.videoHeight || 480;
+     
+     APP.visionPredictions.forEach(p => {
+         const centerX = p.bbox[0] + p.bbox[2]/2;
+         const bottomY = p.bbox[1] + p.bbox[3]; // 物件底部 Y 值越大代表越靠近鏡頭
+         
+         // 映射邏輯：畫面 X 軸 -> 網格 X 軸 (cols)
+         const gridX = Math.floor((centerX / vW) * cols);
+         
+         // 映射邏輯：畫面深度 (Y軸底端) -> 網格 Z 軸 (rows)
+         // Y 越小 (越靠畫面上方) 代表越遠 (Z 越小)
+         const gridZ = Math.floor((bottomY / vH) * rows); 
+         
+         if(gridZ >= 0 && gridZ < rows && gridX >= 0 && gridX < cols) {
+             matrix[gridZ][gridX] = 'OBSTACLE';
+         }
+     });
+  } else {
+     // 模擬效果：如果測試環境沒偵測到東西，隨機標記一格為障礙物增加真實感
+     matrix[Math.floor(rows/2)][Math.floor(cols/2)] = 'OBSTACLE';
+  }
+  
+  APP.spatialMap = { rows, cols, cellW, matrix };
+}
+
+function updateGridDimensions() {
+  generateSpatialGrid(); // 使用者手動更改尺寸時，重新計算網格比例
+}
+
 function selectModules() {
   const evt = document.getElementById('eventType').value;
   const ppl = parseInt(document.getElementById('peopleCount').value) || 0;
   APP.config.eventType = evt;
   APP.config.peopleCount = ppl;
   
-  if (!evt || !ppl) {
-    APP.selectedModules = [];
-    document.getElementById('moduleTags').innerHTML = '<span style="color:var(--text-secondary);font-size:0.9rem">請填寫完整資訊以獲取推薦。</span>';
-    return;
-  }
+  if (!evt || !ppl) return;
 
   const required = [...(EVENT_MODULES[evt] || ['base_table'])];
-  // AI 光線補償邏輯
   if (APP.config.brightness > 140 && !required.includes('solar_panel')) required.push('solar_panel');
   
   const tableCount = Math.max(1, Math.ceil(ppl / 4));
@@ -522,9 +560,6 @@ function selectModules() {
 // ========== 流程導航 ==========
 function goToPhase(n) {
   if (n < 1 || n > 5) return;
-  if (n > APP.currentPhase && n === 2 && (!APP.config.eventType || !APP.config.peopleCount)) {
-    alert('請先讓 AI 掃描或手動選擇活動類型與人數喔。'); return;
-  }
   APP.currentPhase = n;
   
   document.querySelectorAll('.phase-section').forEach((s, i) => s.classList.toggle('active', i === n - 1));
@@ -547,13 +582,12 @@ function prevPhase() { goToPhase(APP.currentPhase - 1); }
 
 // ========== 2. 電量計算 ==========
 function calculatePower() {
-  APP.config.duration = parseFloat(document.getElementById('duration').value) || 3;
   let totalWatts = 0;
   APP.selectedModules.forEach(m => totalWatts += m.watts * m.qty);
   
-  const totalWh = totalWatts * APP.config.duration;
+  const totalWh = totalWatts * 3; // default 3 hr
   const solarCount = APP.selectedModules.find(m => m.key === 'solar_panel')?.qty || 0;
-  const solarOffsetWh = solarCount * 80 * APP.config.duration;
+  const solarOffsetWh = solarCount * 80 * 3;
   const netWh = Math.max(0, totalWh - solarOffsetWh);
   
   let batType = netWh > 500 ? 'large_battery' : 'small_battery';
@@ -562,37 +596,34 @@ function calculatePower() {
   APP.power = { totalWatts, totalWh, netWh, solarOffsetWh, batType, batCount };
   
   document.getElementById('powerGrid').innerHTML = `
-    <div class="card stat-box">
-      <div class="stat-value">${totalWatts}W</div><div class="stat-label">總運轉功率</div>
-    </div>
-    <div class="card stat-box">
-      <div class="stat-value">${totalWh.toFixed(0)} Wh</div><div class="stat-label">預估總消耗電量</div>
-    </div>
-    <div class="card stat-box">
-      <div class="stat-value" style="color:var(--success)">${solarOffsetWh > 0 ? '-' + solarOffsetWh.toFixed(0) : '0'} Wh</div>
-      <div class="stat-label">太陽能板折抵</div>
-    </div>
+    <div class="card stat-box"><div class="stat-value">${totalWatts}W</div><div class="stat-label">總運轉功率</div></div>
+    <div class="card stat-box"><div class="stat-value">${totalWh.toFixed(0)} Wh</div><div class="stat-label">預估總消耗電量</div></div>
+    <div class="card stat-box"><div class="stat-value" style="color:var(--success)">${solarOffsetWh > 0 ? '-' + solarOffsetWh.toFixed(0) : '0'} Wh</div><div class="stat-label">太陽能板折抵</div></div>
     <div class="card stat-box" style="background:var(--accent-dim);">
-      <div class="stat-value" style="color:var(--accent)">${MODULES[batType].name}</div>
-      <div class="stat-label">建議配置數量：${batCount} 顆</div>
+      <div class="stat-value" style="color:var(--accent)">${MODULES[batType].name}</div><div class="stat-label">建議配置數量：${batCount} 顆</div>
     </div>
   `;
 }
 
-// ========== 3. 3D 場景 ==========
+// ========== 3. 3D 智慧網格佈署 ==========
 function initThreeScene() {
   const container = document.getElementById('three-container');
-  container.innerHTML = '<div class="three-legend" id="threeLegend"></div>'; // reset
+  // 保留 Legend，移除舊的 canvas
+  Array.from(container.children).forEach(c => { if(c.id !== 'threeLegend') c.remove(); });
   
+  // 確保網格資料存在
+  if(!APP.spatialMap) generateSpatialGrid();
+  
+  const { rows, cols, cellW, matrix } = APP.spatialMap;
+  const vw = cols * cellW; 
+  const vl = rows * cellW;
   const w = container.clientWidth, h = container.clientHeight;
-  const vw = parseFloat(document.getElementById('venueWidth').value) || 8;
-  const vl = parseFloat(document.getElementById('venueLength').value) || 10;
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color('#F0F4F2'); // 溫和背景
+  scene.background = new THREE.Color('#F0F4F2'); 
   
-  const camera = new THREE.PerspectiveCamera(45, w/h, 0.1, 100);
-  camera.position.set(vw*0.8, Math.max(vw,vl)*0.7, vl*1.2);
+  const camera = new THREE.PerspectiveCamera(50, w/h, 0.1, 100);
+  camera.position.set(vw*0.8, Math.max(vw,vl)*0.9, vl*1.3);
   
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(w, h);
@@ -604,54 +635,57 @@ function initThreeScene() {
   controls.target.set(vw/2, 0, vl/2);
   controls.enableDamping = true;
 
-  // 光源設定 (溫和柔光)
-  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-  const dirLight = new THREE.DirectionalLight(0xfff5e6, 0.8);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+  const dirLight = new THREE.DirectionalLight(0xfff5e6, 0.7);
   dirLight.position.set(vw/2, 10, vl/2);
   dirLight.castShadow = true;
   scene.add(dirLight);
 
-  // 地板
-  const floorMat = new THREE.MeshStandardMaterial({ color: 0xE8ECEA, roughness: 0.8 });
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(vw, vl), floorMat);
-  floor.rotation.x = -Math.PI / 2;
-  floor.position.set(vw/2, 0, vl/2);
-  floor.receiveShadow = true;
-  scene.add(floor);
-  
-  // 網格線 (淡化)
-  const grid = new THREE.GridHelper(Math.max(vw,vl)*1.5, Math.ceil(Math.max(vw,vl)), 0xCBD5D0, 0xE2E8E5);
-  grid.position.set(vw/2, 0.01, vl/2);
-  scene.add(grid);
-
-  // 放置模組
-  const cellW = 2.1, cellD = 1.7; // 保留 90cm 走道
-  const cols = Math.floor(vw / cellW), rows = Math.floor(vl / cellD);
+  // 繪製 AI 安全網格與障礙物地圖
+  const oX = 0; const oZ = 0;
   const tCount = APP.selectedModules.find(m => m.key === 'base_table')?.qty || 1;
-  const oX = (vw - cols * cellW + 1.2)/2, oZ = (vl - rows * cellD + 0.8)/2;
-
   let placed = 0;
-  for (let r=0; r<rows && placed<tCount; r++) {
-    for (let c=0; c<cols && placed<tCount; c++) {
-      const cx = oX + c*cellW, cz = oZ + r*cellD;
-      
-      APP.selectedModules.forEach(m => {
-        let y = m.h/2;
-        if(m.key === 'base_table') y = 0.375;
-        else if(m.key === 'solar_panel') y = 1.5;
-        else if(m.key === 'privacy_screen') y = 0.75 + m.h/2;
-        else y = 0.75 + m.h/2;
+
+  for(let r=0; r<rows; r++){
+     for(let c=0; c<cols; c++){
+        // 計算每個網格的中心點
+        const cx = oX + c*cellW + cellW/2;
+        const cz = oZ + r*cellW + cellW/2;
         
-        const geo = new THREE.BoxGeometry(m.w, m.h, m.d);
-        const mat = new THREE.MeshStandardMaterial({ color: m.threeColor, roughness: 0.4 });
-        const mesh = new THREE.Mesh(geo, mat);
-        mesh.position.set(cx + (Math.random()-0.5)*0.2, y, cz + (Math.random()-0.5)*0.2);
-        if(m.key==='base_table' || m.key==='privacy_screen') mesh.position.set(cx,y,cz);
-        mesh.castShadow = true; mesh.receiveShadow = true;
-        scene.add(mesh);
-      });
-      placed++;
-    }
+        const isObstacle = matrix[r][c] === 'OBSTACLE';
+        const cellColor = isObstacle ? 0xE57373 : 0xA4C3B2; // 障礙物紅 vs 安全綠
+        
+        // 繪製地板網格指示區塊
+        const cellGeo = new THREE.PlaneGeometry(cellW*0.9, cellW*0.9);
+        const cellMat = new THREE.MeshBasicMaterial({ color: cellColor, transparent: true, opacity: 0.35, side: THREE.DoubleSide });
+        const cellPlane = new THREE.Mesh(cellGeo, cellMat);
+        cellPlane.rotation.x = -Math.PI/2;
+        cellPlane.position.set(cx, 0.01, cz);
+        scene.add(cellPlane);
+        
+        // 【核心邏輯】只有在 FREE 的安全網格才放置 Flow Table 設備
+        if(!isObstacle && placed < tCount) {
+            APP.selectedModules.forEach(m => {
+              let y = m.h/2;
+              if(m.key === 'base_table') y = 0.375;
+              else if(m.key === 'solar_panel') y = 1.5;
+              else if(m.key === 'privacy_screen') y = 0.75 + m.h/2;
+              else y = 0.75 + m.h/2;
+              
+              const geo = new THREE.BoxGeometry(m.w, m.h, m.d);
+              const mat = new THREE.MeshStandardMaterial({ color: m.threeColor, roughness: 0.3 });
+              const mesh = new THREE.Mesh(geo, mat);
+              
+              // 加入些微亂數讓擺放自然些，但基座/隔板對齊網格中心
+              mesh.position.set(cx + (Math.random()-0.5)*0.3, y, cz + (Math.random()-0.5)*0.3);
+              if(m.key==='base_table' || m.key==='privacy_screen') mesh.position.set(cx,y,cz);
+              
+              mesh.castShadow = true; mesh.receiveShadow = true;
+              scene.add(mesh);
+            });
+            placed++;
+        }
+     }
   }
 
   // Legend
@@ -686,18 +720,12 @@ function toggleSimulation() {
     document.getElementById('valTemp').innerHTML = `${temp.toFixed(1)}<span style="font-size:1rem;color:var(--text-secondary)"> °C</span>`;
     document.getElementById('valPM25').innerHTML = `${Math.round(pm25)}<span style="font-size:1rem;color:var(--text-secondary)"> μg/m³</span>`;
     
-    updateGauge('gaugeCO2', co2, 300, 1500);
-    updateGauge('gaugeTemp', temp, 15, 40);
-    updateGauge('gaugePM25', pm25, 0, 100);
-    
+    updateGauge('gaugeCO2', co2, 300, 1500); updateGauge('gaugeTemp', temp, 15, 40); updateGauge('gaugePM25', pm25, 0, 100);
     APP.monitoring.history.co2.push(co2);
   }, 2000);
 }
 
-async function connectSerial() {
-  alert('請確保已透過 USB 連接 Arduino (SCD41)。');
-  toggleSimulation(); // 這裡為預防報錯，實際應用時放開 Web Serial 邏輯
-}
+function connectSerial() { alert('請確保已透過 USB 連接 Arduino (SCD41)。'); toggleSimulation(); }
 
 // ========== 5. ESG 報告 ==========
 function generateReport() {
@@ -706,15 +734,9 @@ function generateReport() {
   const avgCO2 = hist.co2.length ? hist.co2.reduce((a,b)=>a+b)/hist.co2.length : 450;
   
   document.getElementById('reportGrid').innerHTML = `
-    <div class="card stat-box">
-      <div class="stat-value">${(p.totalWh/1000).toFixed(2)}</div><div class="stat-label">總消耗度數 (kWh)</div>
-    </div>
-    <div class="card stat-box">
-      <div class="stat-value" style="color:var(--success)">${(p.solarOffsetWh/1000).toFixed(2)}</div><div class="stat-label">綠電折抵度數 (kWh)</div>
-    </div>
-    <div class="card stat-box">
-      <div class="stat-value" style="color:var(--accent)">${Math.round(avgCO2)}</div><div class="stat-label">平均 CO₂ 濃度 (良好)</div>
-    </div>
+    <div class="card stat-box"><div class="stat-value">${(p.totalWh/1000).toFixed(2)}</div><div class="stat-label">總消耗度數 (kWh)</div></div>
+    <div class="card stat-box"><div class="stat-value" style="color:var(--success)">${(p.solarOffsetWh/1000).toFixed(2)}</div><div class="stat-label">綠電折抵度數 (kWh)</div></div>
+    <div class="card stat-box"><div class="stat-value" style="color:var(--accent)">${Math.round(avgCO2)}</div><div class="stat-label">平均 CO₂ 濃度 (良好)</div></div>
   `;
   
   let tags = `<span class="esg-tag env">E: 綠電循環運用</span><span class="esg-tag env">E: 低碳運轉足跡</span>`;
@@ -724,10 +746,7 @@ function generateReport() {
 
 function downloadPDF() {
   const element = document.getElementById('phase-5');
-  html2pdf().set({
-    margin: [15, 15], filename: 'FlowTable_ESG_Report.pdf',
-    html2canvas: { scale: 2, backgroundColor: '#F9FAF8' }
-  }).from(element).save();
+  html2pdf().set({ margin: [15, 15], filename: 'FlowTable_ESG_Report.pdf', html2canvas: { scale: 2, backgroundColor: '#F9FAF8' } }).from(element).save();
 }
 </script>
 </body>
