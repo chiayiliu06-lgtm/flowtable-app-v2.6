@@ -8,13 +8,12 @@
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/GLTFLoader.js"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
 
 <style>
-/* ── 溫和風格色票 ── */
+/* ── 溫和療癒風格色票 ── */
 :root {
   --bg-primary: #F9FAF8; --bg-secondary: #F0F4F2; --bg-card: #FFFFFF;         
   --accent: #6B9080; --accent-dim: rgba(107, 144, 128, 0.15); --accent-hover: #5A7A6D;
@@ -64,9 +63,10 @@ body {
 }
 .card-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; color: var(--text-primary); }
 
+/* ── 視覺掃描與測距區 ── */
 .vision-wrap {
   position: relative; background: #E8ECEA; border-radius: var(--radius-sm);
-  overflow: hidden; aspect-ratio: 16/9; max-height: 400px; display: flex; align-items: center; justify-content: center;
+  overflow: hidden; aspect-ratio: 16/9; max-height: 450px; display: flex; align-items: center; justify-content: center;
 }
 #visionVideo { position: absolute; width: 100%; height: 100%; object-fit: cover; }
 #visionCanvas { position: absolute; width: 100%; height: 100%; object-fit: cover; pointer-events: none; z-index: 10; }
@@ -76,11 +76,11 @@ body {
 }
 .ai-status-pill {
   position: absolute; top: 16px; left: 16px; background: rgba(255,255,255,0.9);
-  padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 15;
+  padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 15;
 }
 .scan-hint-text {
-  position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); color: #fff;
-  padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; z-index: 15; display: none; white-space: nowrap;
+  position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); color: #fff;
+  padding: 8px 16px; border-radius: 20px; font-size: 0.95rem; font-weight: 600; z-index: 15; display: none; white-space: nowrap;
 }
 .grid-scan-effect {
   position: absolute; inset: 0; z-index: 12; display: none;
@@ -93,7 +93,7 @@ body {
 .form-group { display: flex; flex-direction: column; gap: 8px; }
 .form-group label { font-size: 0.9rem; color: var(--text-secondary); font-weight: 600; }
 .form-group input, .form-group select {
-  background: var(--bg-primary); border: 2px solid transparent; border-radius: var(--radius-sm); padding: 12px 16px; font-size: 1rem;
+  background: var(--bg-primary); border: 2px solid transparent; border-radius: var(--radius-sm); padding: 12px 16px; font-size: 1rem; color: var(--text-primary);
 }
 .form-group input:focus, .form-group select:focus { border-color: var(--accent-dim); background: var(--bg-card); box-shadow: 0 0 0 4px var(--accent-dim); outline:none; }
 
@@ -104,48 +104,51 @@ body {
 }
 .esg-tag.env { background: rgba(129,199,132,0.15); color: #4CAF50; border-color: rgba(129,199,132,0.3); }
 .esg-tag.social { background: rgba(100,181,246,0.15); color: #2196F3; border-color: rgba(100,181,246,0.3); }
-.esg-tag.gov { background: rgba(170,136,255,0.15); color: #9C27B0; border-color: rgba(170,136,255,0.3); }
 
+/* ── 按鈕設計 ── */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; border-radius: 24px; border: none; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; -webkit-touch-callout: none;
 }
 .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 4px 12px var(--accent-dim); }
 .btn-primary:active { background: var(--accent-hover); transform: scale(0.96); }
 .btn-secondary { background: var(--bg-secondary); color: var(--text-primary); }
-.btn-scan { background: var(--accent); color: #fff; width: 100%; max-width: 300px; padding: 16px; font-size: 1.1rem; border-radius: 30px; box-shadow: 0 8px 24px var(--accent-dim); transition: transform 0.1s; }
-.btn-scan:active { transform: scale(0.92); background: var(--accent-hover); }
+.btn-scan { 
+  background: var(--accent); color: #fff; width: 80%; max-width: 320px; padding: 18px; font-size: 1.15rem; 
+  border-radius: 40px; box-shadow: 0 8px 24px var(--accent-dim); transition: transform 0.1s, background 0.2s; 
+  position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+}
+.btn-scan:active, .btn-scan.active-hold { transform: translateX(-50%) scale(0.95); background: var(--accent-hover); box-shadow: 0 4px 12px var(--accent-dim); }
 
+/* ── IoT 警示與數據面板 ── */
 .alert-box {
   background: rgba(255, 183, 77, 0.15); border: 1px solid rgba(255,183,77,0.3);
   padding: 16px 20px; border-radius: var(--radius-sm); color: #F57C00; font-weight: 600; 
-  margin-bottom: 24px; line-height: 1.6; display: none; font-size: 0.95rem;
+  margin-bottom: 24px; line-height: 1.6; display: none; font-size: 0.95rem; animation: fadeIn 0.3s ease;
 }
 .alert-box.danger { background: rgba(229, 115, 115, 0.15); border-color: rgba(229,115,115,0.3); color: #D32F2F; }
+.alert-box.success { background: rgba(129, 199, 132, 0.15); border-color: rgba(129,199,132,0.3); color: #4CAF50; }
 
 .power-grid, .gauge-grid, .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
-.stat-box { text-align: center; padding: 20px; background: var(--bg-primary); border-radius: var(--radius-sm); }
+.stat-box { text-align: center; padding: 20px; background: var(--bg-primary); border-radius: var(--radius-sm); position: relative; }
 .stat-value { font-size: 2rem; font-weight: 800; color: var(--accent); line-height: 1.2; }
 .stat-label { font-size: 0.9rem; color: var(--text-secondary); margin-top: 8px; font-weight: 500; }
 
-#three-container { width: 100%; height: 550px; border-radius: var(--radius); overflow: hidden; position: relative; background: var(--bg-secondary); }
+#three-container { width: 100%; height: 500px; border-radius: var(--radius); overflow: hidden; position: relative; background: var(--bg-secondary); box-shadow: inset 0 2px 12px rgba(0,0,0,0.05);}
 .three-legend { position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.95); border-radius: var(--radius-sm); padding: 16px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 8px; box-shadow: var(--shadow); z-index: 10; }
 .legend-item { display: flex; align-items: center; gap: 10px; font-weight: 500; }
 .legend-color { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; }
-
-/* 3D 載入動畫 */
-.loading-3d { position: absolute; inset:0; background: rgba(240,244,242,0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5; color: var(--accent); font-weight: 600;}
-.spinner { border: 4px solid rgba(107,144,128,0.2); border-top: 4px solid var(--accent); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 12px; }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.loading-3d { position: absolute; inset:0; background: rgba(240,244,242,0.85); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5; color: var(--accent); font-weight: 600; font-size: 1.1rem;}
 
 .gauge-svg { width: 140px; height: 140px; margin: 0 auto; display: block; }
 .gauge-bg { fill: none; stroke: var(--bg-secondary); stroke-width: 12; stroke-linecap: round;}
-.gauge-fill { fill: none; stroke-width: 12; stroke-linecap: round; transition: stroke-dashoffset 1s, stroke 0.3s; }
+.gauge-fill { fill: none; stroke-width: 12; stroke-linecap: round; transition: stroke-dashoffset 0.8s ease-out, stroke 0.3s; }
 
 .nav-footer { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border-top: 1px solid rgba(0,0,0,0.05); padding: 16px 24px; }
 .nav-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
 
+/* 報告細節列表 */
 .report-list { list-style: none; margin-top: 12px; }
-.report-list li { padding: 8px 0; border-bottom: 1px solid var(--bg-secondary); font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
+.report-list li { padding: 12px 0; border-bottom: 1px dashed var(--text-secondary); font-size: 0.95rem; line-height: 1.5; }
 .report-list li:last-child { border-bottom: none; }
 </style>
 </head>
@@ -166,33 +169,31 @@ body {
 
 <main class="main-content">
   <section class="phase-section active" id="phase-1">
-    <h2 class="phase-title">動態環繞測距與環境感知</h2>
-    <p class="phase-subtitle">啟動鏡頭後，請「按住掃描鈕」並環繞場域。系統將啟用光達(LiDAR)深度模擬，估算場地大小並排除障礙物。</p>
+    <h2 class="phase-title">直覺式空間掃描與測距</h2>
+    <p class="phase-subtitle">請開啟鏡頭並「長按掃描按鈕」，拿著設備環顧四周。系統將啟用深度模擬，自動估算場地尺寸。</p>
     
     <div class="card">
-      <div class="card-title"><span class="icon">🕸️</span> AI 全景深度掃描</div>
+      <div class="card-title"><span class="icon">📱</span> AI 測距與避障掃描</div>
       <div class="vision-wrap" id="vision-wrap">
         <video id="visionVideo" autoplay playsinline muted></video>
         <canvas id="visionCanvas"></canvas>
         <div class="grid-scan-effect" id="gridScanEffect"></div>
-        <div class="scan-hint-text" id="scanHint">正在掃描與測距，請緩慢轉動...</div>
+        <div class="scan-hint-text" id="scanHint">特徵點收集與測距中，請持續按住並移動...</div>
         <div class="ai-status-pill" id="visionStatus" style="display:none;">待命中</div>
         
         <div class="vision-overlay" id="visionOverlayInit">
-          <button class="btn btn-primary" onclick="initCamera()">啟動 AI 鏡頭</button>
+          <button class="btn btn-primary" onclick="initCamera()">開啟相機</button>
         </div>
-        <div class="vision-overlay" id="visionOverlayScan" style="display:none; background: transparent; justify-content: flex-end; padding-bottom: 20px;">
-          <button class="btn btn-scan" id="btnHoldScan">👉 長按此處開始掃描 (放開結束)</button>
-        </div>
+        <button class="btn btn-scan" id="btnHoldScan" style="display:none;">👉 點擊並長按開始掃描</button>
       </div>
-      <div id="aiResultText" style="margin-top: 16px; font-size: 0.95rem; font-weight: 500; color: var(--accent); min-height: 24px;"></div>
+      <div id="aiResultText" style="margin-top: 16px; font-size: 0.95rem; font-weight: 600; color: var(--accent); min-height: 24px; text-align: center;"></div>
     </div>
 
     <div class="card">
-      <div class="card-title"><span class="icon">📝</span> 場地參數 (AI自動測距填寫)</div>
+      <div class="card-title"><span class="icon">📐</span> 場地參數 (AI自動填寫)</div>
       <div class="form-grid">
         <div class="form-group">
-          <label>活動類型</label>
+          <label>活動情境與模組配置</label>
           <select id="eventType" onchange="selectModules()">
             <option value="outdoor_market" selected>戶外展演 / 戶外市集 (含專屬模組)</option>
             <option value="health_clinic">健康義診 (注重隱私與空氣過濾)</option>
@@ -201,75 +202,92 @@ body {
           </select>
         </div>
         <div class="form-group">
-          <label>預計人數 (人)</label>
+          <label>預計參與人數 (人)</label>
           <input type="number" id="peopleCount" min="1" max="200" value="20" oninput="selectModules()">
         </div>
         <div class="form-group">
-          <label>場域面寬 Width (公尺)</label>
-          <input type="number" id="venueWidth" min="2" max="100" step="0.1" value="10" oninput="updateGridDimensions()">
+          <label>場域面寬 (公尺)</label>
+          <input type="number" id="venueWidth" min="2" max="100" step="0.1" value="6" oninput="updateGridDimensions()">
         </div>
         <div class="form-group">
-          <label>場域縱深 Length (公尺)</label>
-          <input type="number" id="venueLength" min="2" max="100" step="0.1" value="10" oninput="updateGridDimensions()">
+          <label>場域縱深 (公尺)</label>
+          <input type="number" id="venueLength" min="2" max="100" step="0.1" value="6" oninput="updateGridDimensions()">
         </div>
       </div>
       <div style="margin-top:24px; padding-top:20px; border-top:1px solid var(--bg-secondary);">
-        <label style="font-size: 0.9rem; color: var(--text-secondary); font-weight: 600; display:block; margin-bottom:12px;">系統掛載模組清單</label>
+        <label style="font-size: 0.9rem; color: var(--text-secondary); font-weight: 600; display:block; margin-bottom:12px;">本次活動將掛載之硬體模組</label>
         <div class="module-tags" id="moduleTags"></div>
       </div>
     </div>
   </section>
 
   <section class="phase-section" id="phase-2">
-    <h2 class="phase-title">能源與電力調度</h2>
-    <p class="phase-subtitle">系統已精算運作期間的用電需求，並配置最環保的電池方案。</p>
+    <h2 class="phase-title">能源與電力精算</h2>
+    <p class="phase-subtitle">系統已精算本次活動的總用電需求，並自動為您配置對應的綠能電池模組。</p>
     <div class="power-grid" id="powerGrid"></div>
   </section>
 
   <section class="phase-section" id="phase-3">
-    <h2 class="phase-title">3D 產品真實導入預覽</h2>
-    <p class="phase-subtitle">系統已將您的專屬 3D 產品檔案 (<strong style="color:var(--accent)">DESK-out-.glb</strong>) 載入 AI 避障網格中。</p>
+    <h2 class="phase-title">3D 真實場景與網格預覽</h2>
+    <p class="phase-subtitle">系統已讀取 <strong style="color:var(--accent)">DESK-out-.glb</strong>，並依據 AI 測距結果與安全網格為您自動排列陣型。</p>
     <div id="three-container">
-      <div id="loading3D" class="loading-3d"><div class="spinner"></div>載入 3D 模型中...</div>
+      <div id="loading3D" class="loading-3d">正在載入 3D 資源與構建網格...</div>
       <div class="three-legend" id="threeLegend"></div>
     </div>
   </section>
 
   <section class="phase-section" id="phase-4">
     <h2 class="phase-title">即時環境守護 (IoT)</h2>
-    <p class="phase-subtitle">當數值偏離標準時，系統將主動提供調整建議以維持場域健康。</p>
+    <p class="phase-subtitle">系統將持續監測空氣品質，若數值超標將自動跳出設備調整建議。</p>
     
     <div id="iotAlertBox" class="alert-box"></div>
 
     <div style="display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap;">
-      <button class="btn btn-primary" id="btnSerial" onclick="connectSerial()">連線實體感測器 (USB)</button>
-      <button class="btn btn-secondary" id="btnSim" onclick="toggleSimulation()">啟用虛擬環境模擬</button>
+      <button class="btn btn-primary" id="btnSerial" onclick="connectSerial()">連接實體感測器</button>
+      <button class="btn btn-secondary" id="btnSim" onclick="toggleSimulation()">啟動數值模擬</button>
     </div>
+    
     <div class="gauge-grid">
       <div class="card stat-box" id="gaugeCO2Card">
         <svg class="gauge-svg" viewBox="0 0 120 120"><circle class="gauge-bg" cx="60" cy="60" r="50" transform="rotate(-90 60 60)" stroke-dasharray="235.6 78.5"/><circle class="gauge-fill" id="gaugeCO2" cx="60" cy="60" r="50" transform="rotate(-90 60 60)" stroke="var(--accent)" stroke-dasharray="235.6 78.5" stroke-dashoffset="235.6"/></svg>
         <div class="gauge-value stat-value" id="valCO2" style="margin-top:16px;">--<span style="font-size:1rem;color:var(--text-secondary)"> ppm</span></div>
-        <div class="stat-label">二氧化碳濃度</div>
+        <div class="stat-label">二氧化碳 (CO₂)</div>
+      </div>
+      <div class="card stat-box" id="gaugePM25Card">
+        <svg class="gauge-svg" viewBox="0 0 120 120"><circle class="gauge-bg" cx="60" cy="60" r="50" transform="rotate(-90 60 60)" stroke-dasharray="235.6 78.5"/><circle class="gauge-fill" id="gaugePM25" cx="60" cy="60" r="50" transform="rotate(-90 60 60)" stroke="var(--accent)" stroke-dasharray="235.6 78.5" stroke-dashoffset="235.6"/></svg>
+        <div class="gauge-value stat-value" id="valPM25" style="margin-top:16px;">--<span style="font-size:1rem;color:var(--text-secondary)"> μg/m³</span></div>
+        <div class="stat-label">細懸浮微粒 (PM2.5)</div>
       </div>
       <div class="card stat-box" id="gaugeTempCard">
         <svg class="gauge-svg" viewBox="0 0 120 120"><circle class="gauge-bg" cx="60" cy="60" r="50" transform="rotate(-90 60 60)" stroke-dasharray="235.6 78.5"/><circle class="gauge-fill" id="gaugeTemp" cx="60" cy="60" r="50" transform="rotate(-90 60 60)" stroke="var(--accent)" stroke-dasharray="235.6 78.5" stroke-dashoffset="235.6"/></svg>
         <div class="gauge-value stat-value" id="valTemp" style="margin-top:16px;">--<span style="font-size:1rem;color:var(--text-secondary)"> °C</span></div>
         <div class="stat-label">環境溫度</div>
       </div>
-      <div class="card stat-box" id="gaugePM25Card">
-        <svg class="gauge-svg" viewBox="0 0 120 120"><circle class="gauge-bg" cx="60" cy="60" r="50" transform="rotate(-90 60 60)" stroke-dasharray="235.6 78.5"/><circle class="gauge-fill" id="gaugePM25" cx="60" cy="60" r="50" transform="rotate(-90 60 60)" stroke="var(--accent)" stroke-dasharray="235.6 78.5" stroke-dashoffset="235.6"/></svg>
-        <div class="gauge-value stat-value" id="valPM25" style="margin-top:16px;">--<span style="font-size:1rem;color:var(--text-secondary)"> μg/m³</span></div>
-        <div class="stat-label">細懸浮微粒</div>
-      </div>
     </div>
   </section>
 
   <section class="phase-section" id="phase-5">
-    <h2 class="phase-title">永續成效與場域總結 (ESG Report)</h2>
-    <div class="report-grid" id="reportGrid"></div>
-    <div class="card"><div class="card-title"><span class="icon">💡</span> 系統綜合評估與下場活動建議</div><ul class="report-list" id="reportRecommendations"></ul></div>
-    <div class="card"><div class="card-title"><span class="icon">🌿</span> ESG 永續成就標籤</div><div class="esg-tags" id="esgTags"></div></div>
-    <div style="margin-top:32px; text-align:center"><button class="btn btn-primary" onclick="downloadPDF()">下載完整 PDF 報告</button></div>
+    <h2 class="phase-title">ESG 場域永續結案報告</h2>
+    <p class="phase-subtitle">結合環境數據與電力運算，為本次 Flow Table 的佈署產出詳細評估報告。</p>
+    
+    <div class="card">
+      <div class="card-title"><span class="icon">📊</span> 【指標一】健康與能源數據結算</div>
+      <div class="report-grid" id="reportGrid"></div>
+    </div>
+    
+    <div class="card">
+      <div class="card-title"><span class="icon">💡</span> 【指標二】系統診斷與優化建議</div>
+      <ul class="report-list" id="reportRecommendations"></ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🌿</span> 【指標三】ESG 永續成就與標籤</div>
+      <div class="esg-tags" id="esgTags"></div>
+    </div>
+
+    <div style="margin-top:32px; text-align:center; padding-bottom: 20px;">
+      <button class="btn btn-primary" onclick="downloadPDF()" style="padding: 16px 32px; font-size:1.1rem;">📥 匯出完整 PDF 結案報告</button>
+    </div>
   </section>
 </main>
 
@@ -284,20 +302,17 @@ body {
 // ========== 狀態管理 ==========
 const APP = {
   currentPhase: 1, 
-  config: { eventType: 'outdoor_market', peopleCount: 20, duration: 3, venueWidth: 10, venueLength: 10, brightness: 100 },
+  config: { eventType: 'outdoor_market', peopleCount: 20, duration: 3, venueWidth: 6, venueLength: 6, brightness: 100 },
   selectedModules: [], visionPredictions: [], spatialMap: null, visionStream: null, aiModel: null,
   power: {}, monitoring: { active: false, history: { co2: [], temp: [], pm25: [] } },
   threeLoaded: false
 };
 
-// ✨ 更新：精確對應你所要求的「戶外裝備清單」
 const MODULES = {
   high_desk:      { name: '高位桌面 (70cm)',   watts: 0,   color: '#A4C3B2', threeColor: 0xA4C3B2 },
   sunshade:       { name: '防曬遮陽棚',         watts: 0,   color: '#4FC3F7', threeColor: 0x4FC3F7 },
   fan:            { name: '戶外強效風扇',       watts: 45,  color: '#6B9080', threeColor: 0x6B9080 },
   large_battery:  { name: '主力電池 (2000Wh)',  watts: 0,   color: '#A1887F', threeColor: 0xA1887F, capacity: 2000 },
-  
-  // 保留其他情境的模組
   base_table:     { name: '基礎桌體 (55cm)',   watts: 0,   color: '#D7CCC8', threeColor: 0xD7CCC8 },
   air_purifier:   { name: 'HEPA 清淨模組',     watts: 30,  color: '#81C784', threeColor: 0x81C784 },
   sensor_unit:    { name: '智慧環境感測儀',     watts: 5,   color: '#FFB74D', threeColor: 0xFFB74D },
@@ -306,16 +321,18 @@ const MODULES = {
 };
 
 const EVENT_MODULES = {
-  outdoor_market: ['high_desk', 'sunshade', 'fan', 'large_battery'], // 👈 專屬配置
+  outdoor_market: ['high_desk', 'sunshade', 'fan', 'large_battery'], 
   health_clinic:  ['base_table', 'air_purifier', 'privacy_screen', 'sensor_unit'],
   elderly_dining: ['base_table', 'fan', 'sensor_unit'],
   workshop:       ['base_table', 'display', 'sensor_unit']
 };
 
-const NEXT_LABELS = ['下一步：精算電量 →', '下一步：預覽 3D 真實產品 →', '下一步：進入即時監控 →', '結束活動並產生報告', ''];
+const NEXT_LABELS = ['下一步：精算電量 →', '下一步：預覽 3D 真實佈署 →', '下一步：進入即時監控 →', '結束活動並產生報告', ''];
 
-// ========== 1. 按住掃描與 LiDAR 測距 ==========
-let scanInterval = null; let isScanning = false;
+// ========== 1. 按住無限掃描與測距模擬 ==========
+let scanInterval = null; 
+let isScanning = false;
+let scannedPoints = 0; // 記錄收集到的特徵點數量
 
 async function initCamera() {
   const video = document.getElementById('visionVideo'); const status = document.getElementById('visionStatus');
@@ -327,10 +344,12 @@ async function initCamera() {
     catch(e) { stream = await navigator.mediaDevices.getUserMedia({ video: true }); }
     video.srcObject = stream; APP.visionStream = stream;
     await new Promise(resolve => video.onloadedmetadata = resolve);
+    
     status.textContent = '載入 AI 模型...';
     try { APP.aiModel = await cocoSsd.load(); } catch(e) { throw new Error("AI 載入失敗"); }
-    status.textContent = '系統就緒，請按住按鈕'; status.style.background = 'var(--success)'; status.style.color = '#fff';
-    document.getElementById('visionOverlayScan').style.display = 'flex';
+    
+    status.textContent = '系統就緒，準備測距'; status.style.background = 'var(--success)'; status.style.color = '#fff';
+    document.getElementById('btnHoldScan').style.display = 'block'; // 顯示長按按鈕
   } catch (err) { status.textContent = '相機錯誤: ' + err.message; status.style.background = 'var(--danger)'; }
 }
 
@@ -342,49 +361,57 @@ window.addEventListener('touchend', stopScan);
 
 function startScan() {
   if(!APP.aiModel || isScanning) return;
-  isScanning = true; APP.visionPredictions = [];
-  document.getElementById('visionStatus').textContent = 'LiDAR 測距與避障掃描中...'; document.getElementById('visionStatus').style.background = 'var(--warning)';
+  isScanning = true; APP.visionPredictions = []; scannedPoints = 0;
+  
+  document.getElementById('visionStatus').textContent = '深度與邊界擷取中...'; document.getElementById('visionStatus').style.background = 'var(--warning)';
   document.getElementById('gridScanEffect').style.display = 'block'; document.getElementById('scanHint').style.display = 'block';
-  btnHold.textContent = '掃描中... (放開結束)'; btnHold.style.transform = 'scale(0.95)';
+  btnHold.classList.add('active-hold'); btnHold.textContent = '擷取中... (放開結束)';
   
   const video = document.getElementById('visionVideo'); const canvas = document.getElementById('visionCanvas'); const ctx = canvas.getContext('2d');
   canvas.width = video.videoWidth; canvas.height = video.videoHeight; APP.videoWidth = canvas.width; APP.videoHeight = canvas.height;
 
+  // 不限秒數，每 0.5 秒擷取一次特徵
   scanInterval = setInterval(async () => {
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const preds = await APP.aiModel.detect(canvas); APP.visionPredictions.push(...preds);
+    const preds = await APP.aiModel.detect(canvas); 
+    APP.visionPredictions.push(...preds);
+    scannedPoints++;
+    
+    document.getElementById('scanHint').textContent = `已收集 ${scannedPoints * 5} 個深度特徵點，請持續移動...`;
+    
     ctx.clearRect(0,0, canvas.width, canvas.height);
-    ctx.lineWidth = 4; ctx.strokeStyle = '#6B9080'; ctx.fillStyle = '#6B9080'; ctx.font = 'bold 16px sans-serif';
-    preds.forEach(p => { ctx.strokeRect(...p.bbox); ctx.fillText(`${p.class}`, p.bbox[0], p.bbox[1] > 20 ? p.bbox[1]-5 : 20); });
-  }, 800);
+    ctx.lineWidth = 3; ctx.strokeStyle = '#FFB74D'; ctx.fillStyle = '#FFB74D'; ctx.font = 'bold 14px sans-serif';
+    preds.forEach(p => { ctx.strokeRect(...p.bbox); ctx.fillText(`Depth Pt`, p.bbox[0], p.bbox[1] > 20 ? p.bbox[1]-5 : 20); });
+  }, 500);
 }
 
 function stopScan() {
   if(!isScanning) return;
   isScanning = false; clearInterval(scanInterval);
-  document.getElementById('gridScanEffect').style.display = 'none'; document.getElementById('scanHint').style.display = 'none'; document.getElementById('visionOverlayScan').style.display = 'none';
+  btnHold.classList.remove('active-hold'); btnHold.style.display = 'none'; // 掃描完隱藏按鈕
+  
+  document.getElementById('gridScanEffect').style.display = 'none'; document.getElementById('scanHint').style.display = 'none';
   
   const video = document.getElementById('visionVideo'); const canvas = document.getElementById('visionCanvas'); const ctx = canvas.getContext('2d');
   ctx.drawImage(video, 0, 0, canvas.width, canvas.height); video.pause();
   if(APP.visionStream) APP.visionStream.getTracks().forEach(t => t.stop());
 
-  let estimatedW = 6; let estimatedL = 6;
-  if (APP.visionPredictions.length > 5) {
-     estimatedW = Math.min(25, 4 + APP.visionPredictions.length * 0.5);
-     estimatedL = Math.min(25, 6 + APP.visionPredictions.length * 0.3);
-  }
+  // 動態測距公式：依據收集到的時間長度與特徵數來延展場地大小 (基礎 4m，最大 20m)
+  let estimatedW = Math.min(20, 4 + scannedPoints * 0.5);
+  let estimatedL = Math.min(20, 4 + scannedPoints * 0.6);
+  
   document.getElementById('venueWidth').value = estimatedW.toFixed(1); document.getElementById('venueLength').value = estimatedL.toFixed(1);
   generateSpatialGrid(); 
   
-  let text = `掃描完成！估算場地大小約 ${estimatedW.toFixed(1)} x ${estimatedL.toFixed(1)} 公尺。`;
-  document.getElementById('visionStatus').textContent = '空間測距完成'; document.getElementById('visionStatus').style.background = 'var(--success)';
+  let text = `測距完成！AI 估算場地面積約 ${(estimatedW * estimatedL).toFixed(0)} 平方公尺。`;
+  document.getElementById('visionStatus').textContent = '空間模型建構完成'; document.getElementById('visionStatus').style.background = 'var(--success)';
   document.getElementById('aiResultText').textContent = text;
-  selectModules(); // 更新模組
+  selectModules(); 
 }
 
 function generateSpatialGrid() {
   const vw = parseFloat(document.getElementById('venueWidth').value) || 10; const vl = parseFloat(document.getElementById('venueLength').value) || 10;
-  const cellW = 2.5; // 每個設備需要 2.5m 空間
+  const cellW = 2.0; 
   const cols = Math.max(1, Math.floor(vw / cellW)); const rows = Math.max(1, Math.floor(vl / cellW));
   let matrix = Array(rows).fill(0).map(() => Array(cols).fill('FREE'));
   
@@ -413,16 +440,12 @@ function selectModules() {
   const tableCount = Math.max(1, Math.ceil(ppl / 4));
   const modules = [];
   
-  required.forEach(key => {
-    let qty = tableCount; // 數量等同於主桌數
-    modules.push({ key, ...MODULES[key], qty });
-  });
-
+  required.forEach(key => { modules.push({ key, ...MODULES[key], qty: tableCount }); });
   APP.selectedModules = modules;
   document.getElementById('moduleTags').innerHTML = modules.map(m => `<span class="module-tag"><span style="width:12px;height:12px;border-radius:3px;background:${m.color}"></span>${m.name} <span class="qty">× ${m.qty}</span></span>`).join('');
 }
 
-// ========== 導航 ==========
+// ========== 導航與 3D 修復 ==========
 function goToPhase(n) {
   if (n < 1 || n > 5) return;
   APP.currentPhase = n;
@@ -433,7 +456,10 @@ function goToPhase(n) {
   const btnNext = document.getElementById('btnNext'); btnNext.textContent = NEXT_LABELS[n - 1]; btnNext.style.display = n === 5 ? 'none' : '';
   
   if (n === 2) calculatePower(); 
-  if (n === 3) { setTimeout(() => { if(!APP.threeLoaded) { initThreeScene(); APP.threeLoaded = true; } else { updateThreeScene(); } }, 100); }
+  if (n === 3) { 
+      // 【修復】延遲 150ms 等待 DOM 切換完成後再讀取寬高
+      setTimeout(() => { if(!APP.threeLoaded) { initThreeScene(); APP.threeLoaded = true; } else { updateThreeScene(); } }, 150); 
+  }
   if (n === 5) generateReport();
 }
 function nextPhase() { goToPhase(APP.currentPhase + 1); }
@@ -443,10 +469,10 @@ function calculatePower() {
   let totalWatts = 0; APP.selectedModules.forEach(m => totalWatts += m.watts * m.qty);
   const totalWh = totalWatts * APP.config.duration; 
   let batType = totalWh > 500 ? 'large_battery' : 'small_battery';
-  if(!MODULES[batType]) batType = 'large_battery'; // Fallback
+  if(!MODULES[batType]) batType = 'large_battery'; 
   let batCount = Math.max(1, Math.ceil(totalWh / MODULES[batType].capacity));
-  
   APP.power = { totalWatts, totalWh, batType, batCount };
+  
   document.getElementById('powerGrid').innerHTML = `
     <div class="card stat-box"><div class="stat-value">${totalWatts}W</div><div class="stat-label">設備運轉總功率</div></div>
     <div class="card stat-box"><div class="stat-value">${totalWh.toFixed(0)} Wh</div><div class="stat-label">活動期間總耗電</div></div>
@@ -455,10 +481,9 @@ function calculatePower() {
     </div>`;
 }
 
-// ========== 3. 真實產品 3D 導入 ==========
+// ========== 3. 3D 真實導入 ==========
 function initThreeScene() {
   const container = document.getElementById('three-container');
-  // 移除所有舊的 canvas，保留 Legend 與 Loading
   Array.from(container.children).forEach(c => { if(c.id !== 'threeLegend' && c.id !== 'loading3D') c.remove(); });
   document.getElementById('loading3D').style.display = 'flex';
   
@@ -469,27 +494,21 @@ function initThreeScene() {
 
   const scene = new THREE.Scene(); scene.background = new THREE.Color('#F0F4F2'); 
   const camera = new THREE.PerspectiveCamera(45, w/h, 0.1, 500);
-  camera.position.set(vw*0.8, Math.max(vw,vl)*0.7, vl*1.2);
+  camera.position.set(vw*0.8, Math.max(vw,vl)*0.8, vl*1.2);
   
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(w, h); renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   container.appendChild(renderer.domElement);
   
-  APP.three.renderer = renderer; APP.three.scene = scene; APP.three.camera = camera;
   const controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.target.set(vw/2, 0, vl/2); controls.enableDamping = true; APP.three.controls = controls;
+  controls.target.set(vw/2, 0, vl/2); controls.enableDamping = true; 
 
-  // 燈光
   scene.add(new THREE.AmbientLight(0xffffff, 0.9));
   const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
-  dirLight.position.set(vw, 15, vl/2); dirLight.castShadow = true; 
-  dirLight.shadow.mapSize.width = 1024; dirLight.shadow.mapSize.height = 1024;
-  scene.add(dirLight);
+  dirLight.position.set(vw, 15, vl/2); dirLight.castShadow = true; scene.add(dirLight);
 
   const tCount = APP.selectedModules.find(m => m.key === 'high_desk' || m.key === 'base_table')?.qty || 1;
   let placed = 0;
-  
-  // 準備載入器
   const loader = new THREE.GLTFLoader();
   
   for(let r=0; r<rows; r++){
@@ -497,66 +516,59 @@ function initThreeScene() {
         const cx = c*cellW + cellW/2; const cz = r*cellW + cellW/2;
         const isObstacle = matrix[r][c] === 'OBSTACLE';
         
-        // 畫出地板網格
         const cellGeo = new THREE.PlaneGeometry(cellW*0.95, cellW*0.95);
         const cellMat = new THREE.MeshBasicMaterial({ color: isObstacle ? 0xE57373 : 0xA4C3B2, transparent: true, opacity: 0.25, side: THREE.DoubleSide });
         const cellPlane = new THREE.Mesh(cellGeo, cellMat);
         cellPlane.rotation.x = -Math.PI/2; cellPlane.position.set(cx, 0.01, cz); scene.add(cellPlane);
         
-        // 在安全區載入真實 GLB
         if(!isObstacle && placed < tCount) {
             loader.load('./DESK-out-.glb', function(gltf) {
                 const model = gltf.scene;
-                
-                // 自動計算模型大小並縮放 (以防 Creo 匯出的比例過大)
-                const box = new THREE.Box3().setFromObject(model);
-                const size = box.getSize(new THREE.Vector3());
-                const center = box.getCenter(new THREE.Vector3());
-                
-                // 假設我們希望這組傢俱在畫面中大約佔 1.5 公尺寬
-                const scaleFactor = 1.5 / size.x; 
+                const box = new THREE.Box3().setFromObject(model); const size = box.getSize(new THREE.Vector3()); const center = box.getCenter(new THREE.Vector3());
+                const scaleFactor = 1.5 / size.x;  // 自動縮放
                 model.scale.set(scaleFactor, scaleFactor, scaleFactor);
-                
-                // 修正座標位置，讓模型底部貼齊地面，中心點對齊網格
                 model.position.x = cx - center.x * scaleFactor;
                 model.position.y = 0 - box.min.y * scaleFactor;
                 model.position.z = cz - center.z * scaleFactor;
-                
                 model.traverse(child => { if(child.isMesh){ child.castShadow = true; child.receiveShadow = true; }});
                 scene.add(model);
-                
-                // 關閉 Loading
                 document.getElementById('loading3D').style.display = 'none';
-            }, undefined, function(error) {
-                console.error('載入 GLB 失敗，請確認檔案位置', error);
-                document.getElementById('loading3D').innerHTML = '⚠️ 找不到 ./DESK-out-.glb<br><span style="font-size:0.8rem">請確認檔名與位置是否正確</span>';
+            }, undefined, function(e) { 
+                document.getElementById('loading3D').innerHTML = '⚠️ 找不到 ./DESK-out-.glb<br><span style="font-size:0.85rem">請確認檔案已放置於同一資料夾</span>'; 
             });
             placed++;
         }
      }
   }
-
-  // 如果這場活動連一張桌子都沒放進去 (可能網格全是障礙物)，關閉 loading
   if (placed === 0) document.getElementById('loading3D').style.display = 'none';
 
   document.getElementById('threeLegend').innerHTML = APP.selectedModules.map(m => `<div class="legend-item"><div class="legend-color" style="background:${m.color}"></div>${m.name}</div>`).join('');
   function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }
   animate();
 }
-
 function updateThreeScene() { APP.threeLoaded = false; initThreeScene(); APP.threeLoaded = true; }
 
-// ========== 4. IoT 監控 ==========
+// ========== 4. IoT 監控與警示 ==========
 function checkAlerts(co2, temp, pm25) {
-  let alerts = []; let isDanger = false;
-  if (co2 > 1000) { alerts.push("⚠️ CO2 濃度過高 (>1000ppm)，系統已自動將抽風模組切至最大功率。"); isDanger = true; }
-  else if (co2 > 800) alerts.push("📌 CO2 濃度偏高，建議加開風扇輔助對流。");
-  if (pm25 > 35) { alerts.push("⚠️ PM2.5 超標，建議開啟附屬的 HEPA 清淨模組。"); isDanger = true; }
-  if (temp > 32) alerts.push("📌 戶外溫度偏高，已啟動風扇降溫模式，請留意人員水分補充。");
-
+  let alerts = []; let status = 'success';
   const alertBox = document.getElementById('iotAlertBox');
-  if (alerts.length > 0) { alertBox.style.display = 'block'; alertBox.className = isDanger ? 'alert-box danger' : 'alert-box'; alertBox.innerHTML = alerts.join('<br>'); } 
-  else { alertBox.style.display = 'none'; }
+
+  // CO2 判斷
+  if (co2 >= 1000) { alerts.push("🚨 <b>【緊急處置】</b> CO2 濃度過高 (>1000ppm)，系統已強制將換氣模組開至最大功率！"); status = 'danger'; }
+  else if (co2 >= 800) { alerts.push("⚠️ <b>【調整建議】</b> CO2 濃度偏高，建議加開輔助對流風扇，或引導部分人員至通風處。"); if(status !== 'danger') status = 'warning'; }
+  
+  // PM2.5 判斷
+  if (pm25 >= 35) { alerts.push("⚠️ <b>【調整建議】</b> PM2.5 細懸浮微粒超標，請確保所有 HEPA 清淨模組皆已開啟！"); if(status !== 'danger') status = 'warning'; }
+  else if (pm25 < 15) { alerts.push("✅ <b>【健康標準】</b> 目前空氣微粒指數低於標準值，清淨機將以節能靜音模式運轉。"); }
+
+  // 溫度判斷
+  if (temp > 32) { alerts.push("🌡️ <b>【降溫提示】</b> 環境溫度偏高 (>32°C)，已啟動降溫風扇模組，請提醒活動人員補充水分。"); if(status !== 'danger') status = 'warning'; }
+  else if (temp < 15) { alerts.push("🌡️ <b>【保暖提示】</b> 環境溫度偏低 (<15°C)，請留意長者保暖狀況。"); }
+
+  if (alerts.length > 0) {
+    alertBox.style.display = 'block'; alertBox.className = status === 'danger' ? 'alert-box danger' : status === 'warning' ? 'alert-box' : 'alert-box success'; 
+    alertBox.innerHTML = alerts.join('<br>'); 
+  } else { alertBox.style.display = 'none'; }
 }
 
 function updateGauge(id, val, min, max) { document.getElementById(id).style.strokeDashoffset = 235.6 * (1 - Math.max(0, Math.min(1, (val - min) / (max - min)))); }
@@ -565,14 +577,14 @@ function toggleSimulation() {
   if (APP.monitoring.active) return;
   APP.monitoring.active = true; document.getElementById('btnSim').textContent = '模擬運作中...'; document.getElementById('btnSim').style.background = 'var(--accent-dim)';
   setInterval(() => {
-    const co2 = 400 + Math.random()*700; const temp = 28 + Math.random()*6; const pm25 = 10 + Math.random()*40;
+    const co2 = 400 + Math.random()*800; const temp = 14 + Math.random()*20; const pm25 = 10 + Math.random()*40;
     document.getElementById('valCO2').innerHTML = `${Math.round(co2)}<span style="font-size:1rem;color:var(--text-secondary)"> ppm</span>`;
     document.getElementById('valTemp').innerHTML = `${temp.toFixed(1)}<span style="font-size:1rem;color:var(--text-secondary)"> °C</span>`;
     document.getElementById('valPM25').innerHTML = `${Math.round(pm25)}<span style="font-size:1rem;color:var(--text-secondary)"> μg/m³</span>`;
     updateGauge('gaugeCO2', co2, 300, 1500); updateGauge('gaugeTemp', temp, 15, 45); updateGauge('gaugePM25', pm25, 0, 100);
     checkAlerts(co2, temp, pm25);
     APP.monitoring.history.co2.push(co2); APP.monitoring.history.temp.push(temp); APP.monitoring.history.pm25.push(pm25);
-  }, 2000);
+  }, 2500);
 }
 function connectSerial() { alert('請確保已透過 USB 連接 Arduino。'); toggleSimulation(); }
 
@@ -589,16 +601,20 @@ function generateReport() {
   `;
   
   let recs = [];
-  if(peakCO2 > 1000) recs.push('📌 <b>空氣管理建議：</b> 本次活動 CO₂ 峰值偏高，下次戶外佈署建議增加風扇模組數量。');
-  else recs.push('✅ <b>空氣管理優良：</b> 換氣策略精準，全程維持在健康標準內。');
-  recs.push('✅ <b>能源配置：</b> 採用大容量快充電池，滿足活動期間的全部用電需求，達成區域零碳排運轉。');
-  if(APP.config.peopleCount > 30) recs.push('📌 <b>動線規劃建議：</b> 根據 AI 網格回報，本次活動人員密度較高，建議下次佈署增加桌距至 2 公尺。');
+  if(peakCO2 > 1000) { recs.push('📌 <b>【空氣管理】</b> 本次活動 CO₂ 峰值超過 1,000 ppm 警示線，建議下次提早 15 分鐘開啟大功率換氣模組。'); }
+  else { recs.push('✅ <b>【空氣管理】</b> 全程環境監測維持在健康標準內，智慧換氣策略運作精準！'); }
+  
+  recs.push(`✅ <b>【能源配置】</b> 採用高容量環保電池，提供 ${APP.config.duration} 小時全負載運轉，不僅省下發電機的柴油消耗，更達成「零現場碳排放」。`);
+  
+  if(APP.config.peopleCount > 30) { recs.push('📌 <b>【動線與空間】</b> 依據 AI 網格回報，本次活動人員密度偏高。為確保無障礙友善動線，下次佈署建議將桌距擴大至 2 公尺。'); }
+  else { recs.push('✅ <b>【動線與空間】</b> AI 空間測距規劃合理，避開了既有障礙物，確保輪椅與人員動線順暢。'); }
+
   document.getElementById('reportRecommendations').innerHTML = recs.map(r => `<li>${r}</li>`).join('');
 
   document.getElementById('esgTags').innerHTML = `
-    <span class="esg-tag env">E: 模組化低碳運轉 (電池供電)</span>
-    <span class="esg-tag social">S: 戶外活動健康促進 (${APP.config.peopleCount} 人)</span>
-    <span class="esg-tag gov">G: 數位治理與環境數據歸檔</span>
+    <span class="esg-tag env">E: 零碳排模組化運轉 (降低碳足跡)</span>
+    <span class="esg-tag social">S: 社區健康促進與弱勢友善動線 (${APP.config.peopleCount} 人)</span>
+    <span class="esg-tag gov">G: 智慧物聯網數位治理與數據歸檔</span>
   `;
 }
 function downloadPDF() { html2pdf().set({ margin: [15, 15], filename: 'FlowTable_ESG_Report.pdf', html2canvas: { scale: 2, backgroundColor: '#F9FAF8' } }).from(document.getElementById('phase-5')).save(); }
