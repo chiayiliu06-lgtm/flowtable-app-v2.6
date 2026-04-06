@@ -458,7 +458,113 @@ function goToPhase(n) {
   if (n === 2) calculatePower(); 
   if (n === 3) { 
       // 【修復】延遲 150ms 等待 DOM 切換完成後再讀取寬高
-      setTimeout(() => { if(!APP.threeLoaded) { initThreeScene(); APP.threeLoaded = true; } else { updateThreeScene(); } }, 150); 
+      setTimeout(() => { if(!APP.threeLoaded) { // ========== 3. 真實產品 3D 導入 (防呆進化版) ==========
+function initThreeScene() {
+  const container = document.getElementById('three-container');
+  // 移除所有舊的 canvas，保留 Legend 與 Loading
+  Array.from(container.children).forEach(c => { if(c.id !== 'threeLegend' && c.id !== 'loading3D') c.remove(); });
+  
+  const loadingEl = document.getElementById('loading3D');
+  loadingEl.style.display = 'flex';
+  loadingEl.innerHTML = '<div class="spinner"></div>載入 3D 模型與建立網格中...';
+  
+  if(!APP.spatialMap) generateSpatialGrid();
+  const { rows, cols, cellW, matrix } = APP.spatialMap;
+  const vw = cols * cellW; const vl = rows * cellW;
+  const w = container.clientWidth, h = container.clientHeight;
+
+  const scene = new THREE.Scene(); scene.background = new THREE.Color('#F0F4F2'); 
+  const camera = new THREE.PerspectiveCamera(45, w/h, 0.1, 500);
+  camera.position.set(vw*0.8, Math.max(vw,vl)*0.8, vl*1.2);
+  
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(w, h); renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  container.appendChild(renderer.domElement);
+  
+  APP.three.renderer = renderer; APP.three.scene = scene; APP.three.camera = camera;
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.target.set(vw/2, 0, vl/2); controls.enableDamping = true; APP.three.controls = controls;
+
+  // 燈光
+  scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+  const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  dirLight.position.set(vw, 15, vl/2); dirLight.castShadow = true; 
+  dirLight.shadow.mapSize.width = 1024; dirLight.shadow.mapSize.height = 1024;
+  scene.add(dirLight);
+
+  const tCount = APP.selectedModules.find(m => m.key === 'high_desk' || m.key === 'base_table')?.qty || 1;
+  let placed = 0;
+  const loader = new THREE.GLTFLoader();
+
+  // 🚨 智慧保底機制：檢查是否有綠色網格 (FREE)
+  let hasFreeSpace = false;
+  for(let r=0; r<rows; r++) {
+     for(let c=0; c<cols; c++) {
+        if(matrix[r][c] !== 'OBSTACLE') hasFreeSpace = true;
+     }
+  }
+  // 如果全被標記為紅色障礙物，強制把正中央變回綠色！
+  if(!hasFreeSpace) {
+     console.warn("AI 判定全區皆為障礙物，啟動保底機制，強制清空中央網格！");
+     matrix[Math.floor(rows/2)][Math.floor(cols/2)] = 'FREE';
+  }
+  
+  for(let r=0; r<rows; r++){
+     for(let c=0; c<cols; c++){
+        const cx = c*cellW + cellW/2; const cz = r*cellW + cellW/2;
+        const isObstacle = matrix[r][c] === 'OBSTACLE';
+        
+        // 畫出地板網格
+        const cellGeo = new THREE.PlaneGeometry(cellW*0.95, cellW*0.95);
+        const cellMat = new THREE.MeshBasicMaterial({ color: isObstacle ? 0xE57373 : 0xA4C3B2, transparent: true, opacity: 0.25, side: THREE.DoubleSide });
+        const cellPlane = new THREE.Mesh(cellGeo, cellMat);
+        cellPlane.rotation.x = -Math.PI/2; cellPlane.position.set(cx, 0.01, cz); scene.add(cellPlane);
+        
+        // 在安全區載入真實 GLB
+        if(!isObstacle && placed < tCount) {
+            console.log("開始請求載入：DESK-out-.glb"); // 給開發者看的除錯訊息
+            loader.load('./DESK-out-.glb', function(gltf) {
+                console.log("模型載入成功！");
+                const model = gltf.scene;
+                
+                // 自動計算模型大小並縮放
+                const box = new THREE.Box3().setFromObject(model);
+                const size = box.getSize(new THREE.Vector3());
+                const center = box.getCenter(new THREE.Vector3());
+                
+                // 防呆：避免 Creo 匯出異常導致 size.x 為 0
+                let scaleFactor = 1;
+                if(size.x > 0 && size.x !== Infinity) {
+                    scaleFactor = 1.5 / size.x;  // 縮放基準
+                } else {
+                    console.warn("模型尺寸計算異常，使用預設比例 1");
+                }
+                
+                model.scale.set(scaleFactor, scaleFactor, scaleFactor);
+                
+                // 修正座標位置，貼齊地面
+                model.position.x = cx - center.x * scaleFactor;
+                model.position.y = 0 - box.min.y * scaleFactor;
+                model.position.z = cz - center.z * scaleFactor;
+                
+                model.traverse(child => { if(child.isMesh){ child.castShadow = true; child.receiveShadow = true; }});
+                scene.add(model);
+                
+                // 關閉 Loading
+                loadingEl.style.display = 'none';
+            }, undefined, function(error) {
+                console.error('載入 GLB 失敗：', error);
+                loadingEl.innerHTML = '⚠️ 載入模型失敗<br><span style="font-size:0.85rem">請檢查檔名大小寫，或使用 F12 開發者工具查看錯誤</span>';
+            });
+            placed++;
+        }
+     }
+  }
+
+  document.getElementById('threeLegend').innerHTML = APP.selectedModules.map(m => `<div class="legend-item"><div class="legend-color" style="background:${m.color}"></div>${m.name}</div>`).join('');
+  function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }
+  animate();
+}; APP.threeLoaded = true; } else { updateThreeScene(); } }, 150); 
   }
   if (n === 5) generateReport();
 }
